@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://v2th2mp8vayq"]
+
+[ext_resource type="PackedScene" uid="uid://cgxg8e816b8g4" path="res://entities/player/player.tscn" id="1_jkcsq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
+size = Vector2(200, 40)
+
+[node name="Village" type="Node2D" unique_id=1008683300]
+
+[node name="Wall" type="StaticBody2D" parent="." unique_id=1892512509]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=1713861669]
+shape = SubResource("RectangleShape2D_5efxa")
+
+[node name="Polygon2D" type="Polygon2D" parent="Wall" unique_id=1645705836]
+polygon = PackedVector2Array(-100, -20, 54.771606, -20.000061, 100, -20, 100, 20, -100, 20)
+uv = PackedVector2Array(-100, -20, 100, -20, 100, 20, -100, 20)
+
+[node name="Player" parent="." unique_id=478418677 instance=ExtResource("1_jkcsq")]
+position = Vector2(-200, 0)
