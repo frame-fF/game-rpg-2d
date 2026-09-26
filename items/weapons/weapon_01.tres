@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://i04xigg1lngp"]
+
+[ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_bgha5"]
+[ext_resource type="Texture2D" uid="uid://bxo5xvcpyoy3n" path="res://entities/player/weapons/weapon_01.png" id="1_ykiql"]
+
+[resource]
+script = ExtResource("1_bgha5")
+item_name = "weapon01"
+icon = ExtResource("1_ykiql")
+slot = "weapon"
+attack_bonus = 5
+metadata/_custom_type_script = "uid://dsnryq0h70574"

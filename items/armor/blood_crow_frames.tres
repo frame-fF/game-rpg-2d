@@ -1,0 +1,114 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bbb6yjl8maqgo"]
+
+[ext_resource type="Texture2D" uid="uid://dhhu7t0wb50mo" path="res://entities/player/armor/blood_crow_ceremonial_m/24.png" id="1_dbrj2"]
+[ext_resource type="Texture2D" uid="uid://bbqkxvuuvuowj" path="res://entities/player/armor/blood_crow_ceremonial_m/25.png" id="2_sv7u3"]
+[ext_resource type="Texture2D" uid="uid://vrbpifwtihrl" path="res://entities/player/armor/blood_crow_ceremonial_m/26.png" id="3_ccnvr"]
+[ext_resource type="Texture2D" uid="uid://dbtm2iq7cka2l" path="res://entities/player/armor/blood_crow_ceremonial_m/27.png" id="4_h6vpy"]
+[ext_resource type="Texture2D" uid="uid://d1b5l808ly40q" path="res://entities/player/armor/blood_crow_ceremonial_m/28.png" id="5_mrgpx"]
+[ext_resource type="Texture2D" uid="uid://x6moluqm381h" path="res://entities/player/armor/blood_crow_ceremonial_m/9.png" id="6_q5c23"]
+[ext_resource type="Texture2D" uid="uid://drve0tux747an" path="res://entities/player/armor/blood_crow_ceremonial_m/10.png" id="7_wm1c0"]
+[ext_resource type="Texture2D" uid="uid://b5veqamvwb3qp" path="res://entities/player/armor/blood_crow_ceremonial_m/11.png" id="8_wank0"]
+[ext_resource type="Texture2D" uid="uid://qh0jwro8kvil" path="res://entities/player/armor/blood_crow_ceremonial_m/0.png" id="9_6peho"]
+[ext_resource type="Texture2D" uid="uid://bujd5qlrk0g4n" path="res://entities/player/armor/blood_crow_ceremonial_m/1.png" id="10_yq1k5"]
+[ext_resource type="Texture2D" uid="uid://dxylfrp22gb0s" path="res://entities/player/armor/blood_crow_ceremonial_m/2.png" id="11_gpf65"]
+[ext_resource type="Texture2D" uid="uid://4ld6cemu2qs4" path="res://entities/player/armor/blood_crow_ceremonial_m/12.png" id="12_fpy16"]
+[ext_resource type="Texture2D" uid="uid://dsfqirljejw24" path="res://entities/player/armor/blood_crow_ceremonial_m/15.png" id="13_3kqo0"]
+[ext_resource type="Texture2D" uid="uid://fqkl1ktphk2v" path="res://entities/player/armor/blood_crow_ceremonial_m/13.png" id="14_ohmbl"]
+[ext_resource type="Texture2D" uid="uid://ciwoj0kh6prvs" path="res://entities/player/armor/blood_crow_ceremonial_m/14.png" id="15_t3t4n"]
+[ext_resource type="Texture2D" uid="uid://c5wh7jqn1sgu3" path="res://entities/player/armor/blood_crow_ceremonial_m/3.png" id="16_vy2e5"]
+[ext_resource type="Texture2D" uid="uid://cmc21rcenbq87" path="res://entities/player/armor/blood_crow_ceremonial_m/4.png" id="17_fktel"]
+[ext_resource type="Texture2D" uid="uid://wxdcrpvdxunh" path="res://entities/player/armor/blood_crow_ceremonial_m/5.png" id="18_c7idw"]
+[ext_resource type="Texture2D" uid="uid://cao7wu56slqah" path="res://entities/player/armor/blood_crow_ceremonial_m/6.png" id="19_ygj7s"]
+[ext_resource type="Texture2D" uid="uid://x353oo6txmn1" path="res://entities/player/armor/blood_crow_ceremonial_m/7.png" id="20_dhuuu"]
+[ext_resource type="Texture2D" uid="uid://bob0h6nptlo4c" path="res://entities/player/armor/blood_crow_ceremonial_m/8.png" id="21_cqoqc"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_dbrj2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_sv7u3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ccnvr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_h6vpy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_mrgpx")
+}],
+"loop": 1,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_q5c23")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_wm1c0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_wank0")
+}],
+"loop": 1,
+"name": &"dash",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_6peho")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_yq1k5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_gpf65")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_fpy16")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_3kqo0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_ohmbl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_t3t4n")
+}],
+"loop": 1,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_vy2e5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_fktel")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_c7idw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_ygj7s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_dhuuu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_cqoqc")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 5.0
+}]

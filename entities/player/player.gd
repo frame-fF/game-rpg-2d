@@ -16,9 +16,19 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @export var stats: StatsData
 @onready var attack_area: Area2D = $AttackArea
+@onready var armor_sprite: AnimatedSprite2D = $ArmorSprite
+@export var starting_armor: EquipmentData
+@export var starting_weapon: EquipmentData
+var equipped_weapon: EquipmentData
+var equipped_armor: EquipmentData
+var base_attack_power: int = 0
 
 func _ready() -> void:
-	pass
+	base_attack_power = stats.attack_power
+	if starting_armor:
+		equip_armor(starting_armor)
+	if starting_weapon:
+		equip_weapon(starting_weapon)
 
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
@@ -60,6 +70,7 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 	animated_sprite.flip_h = facing_direction < 0
+	armor_sprite.flip_h = facing_direction < 0
 	attack_area.position.x = 20 * facing_direction
 
 	if is_dashing:
@@ -73,7 +84,20 @@ func _physics_process(_delta: float) -> void:
 	else:
 		animated_sprite.play("idle")
 
+	if equipped_armor:
+		armor_sprite.play(animated_sprite.animation)
+
 func _attack() -> void:
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage"):
 			body.take_damage(stats.attack_power)
+
+func equip_weapon(item: EquipmentData) -> void:
+	equipped_weapon = item
+	stats.attack_power = base_attack_power + item.attack_bonus
+
+func equip_armor(item: EquipmentData) -> void:
+	equipped_armor = item
+	armor_sprite.sprite_frames = item.sprite_frames
+	armor_sprite.visible = true
+	armor_sprite.play(animated_sprite.animation)

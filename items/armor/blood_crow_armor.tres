@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://c1j4kttfsbex1"]
+
+[ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_2ctjc"]
+[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://entities/player/armor/blood_crow_frames.tres.tres" id="2_jylhi"]
+
+[resource]
+script = ExtResource("1_2ctjc")
+item_name = "Blood Crow Ceremonial Armor"
+slot = "armor"
+sprite_frames = ExtResource("2_jylhi")
+metadata/_custom_type_script = "uid://dsnryq0h70574"
