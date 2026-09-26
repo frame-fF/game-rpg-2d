@@ -188,6 +188,8 @@ func _ready() -> void:
 - `body.has_method("ชื่อฟังก์ชัน")` — เช็คก่อนเรียกฟังก์ชันแบบไดนามิก ป้องกัน error ถ้า body ที่ทับซ้อนไม่มีฟังก์ชันนั้นจริง (เช่นไปโดนกำแพงที่ไม่มี `take_damage`)
 - **ตั้งชื่อตัวแปรชนกับฟังก์ชัน built-in ได้แบบไม่มี error แต่มี warning**: ตั้ง `exp` ใน StatsData ชนกับ `exp()` (ฟังก์ชันเลขยกกำลัง e ของ GDScript) — ไม่พังแต่ควรเปลี่ยนชื่อเป็น `experience` กันสับสน
 
+**Animation "attack" ผูกเข้ากับ state:** ใช้ pattern เดียวกับ `is_dashing`/`dash_timer` เป๊ะๆ — เพิ่ม `is_attacking`/`attack_timer`/`attack_duration` แล้วจัดลำดับ priority animation ใหม่: `is_dashing > is_attacking > not is_on_floor() (jump) > direction != 0 (walk) > idle`. เลือกเฟรมท่าโจมตีจาก asset โดยดูรูปย่อ (thumbnail) จริงในหน้าต่างเลือกไฟล์ (สลับจาก List view เป็น Grid/Thumbnail view ที่มุมบนขวาของ FileDialog) แทนการเดาจากชื่อไฟล์ตัวเลข
+
 ---
 
 ## 4. Input Actions ที่ใช้
