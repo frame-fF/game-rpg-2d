@@ -151,6 +151,28 @@ func _physics_process(_delta: float) -> void:
 - เพิ่ม `@export var stats: StatsData` ใน `player.gd`
 - สร้างไฟล์ `.tres` จริง (`player_stats.tres`) ผูกเข้า Player ผ่าน Inspector — เซฟแยกไฟล์ (ไม่ฝังใน .tscn) เพื่อให้ระบบ Save/Load ดึงมาแก้ได้ง่ายทีหลัง
 
+### 3.7 HUD แสดงหลอด HP (`ui/hud/hud.tscn`)
+- Scene ใหม่ Root = **CanvasLayer** (ตรึงกับจอ ไม่ขยับตามกล้อง/โลกเกม ต่างจาก Node2D)
+- เพิ่มลูก `ProgressBar` (มี `min_value`/`max_value`/`value` ในตัว วาดหลอดให้อัตโนมัติ)
+- สคริปต์ `hud.gd`:
+```gdscript
+extends CanvasLayer
+
+@export var stats: StatsData
+@onready var hp_bar: ProgressBar = $HpBar
+
+func _ready() -> void:
+	if stats == null:
+		return
+	hp_bar.max_value = stats.max_hp
+	hp_bar.value = stats.hp
+```
+- **หลักการ:** HUD รับแค่ `StatsData` resource ไปแสดง ไม่อ้างอิงถึง node `Player` ตรงๆ (ถ้า Player ถูกลบ HUD ไม่พังตาม)
+- Instance `hud.tscn` เข้า `village.tscn` เป็นลูกของ `Village` แล้วผูก property **Stats** เป็น `.tres` **ไฟล์เดียวกัน**กับที่ผูกไว้ที่ Player (ไม่ใช่สร้างใหม่ ไม่งั้นข้อมูลจะคนละชุดกัน)
+- **ข้อจำกัดตอนนี้:** โชว์ค่าแค่ตอน `_ready()` ครั้งเดียว ยังไม่ live-update เพราะยังไม่มีระบบต่อสู้ให้ HP เปลี่ยน — พอทำ combat จะกลับมาเพิ่ม signal ทีหลัง
+
+**Control node ต้องรู้:** ProgressBar/Control มี **Minimum Size** จาก Theme เริ่มต้น ถ้าตั้ง Size เล็กกว่าค่าต่ำสุด (เช่นตั้ง height 24 ทั้งที่ขั้นต่ำ 27) Godot จะดันกลับไปที่ค่าต่ำสุดอัตโนมัติ ไม่ใช่บั๊ก
+
 ---
 
 ## 4. Input Actions ที่ใช้
@@ -210,7 +232,7 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 ## 7. Roadmap ที่เหลือ (อ้างอิงจาก `rpg-online-plan.md`)
 
 - [x] Movement + collision (เดิน, กระโดด, พุ่ง, ชนกำแพง)
-- [ ] ระบบ Stats (HP/MP/EXP/Level) — เริ่มแล้ว (`StatsData` resource สร้างเสร็จ, ผูกกับ Player แล้ว) เหลือ: ทำ HUD แสดงหลอด HP
+- [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP เสร็จแล้ว (ยังไม่ live-update รอระบบต่อสู้)
 - [ ] ระบบต่อสู้พื้นฐาน (attack, damage formula, death)
 - [ ] Inventory + Item pickup/ใช้ไอเทม
 - [ ] Skill system (cooldown, mana cost, effect)
