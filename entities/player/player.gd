@@ -11,6 +11,7 @@ var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@export var stats: StatsData
 
 func _ready() -> void:
 	pass
