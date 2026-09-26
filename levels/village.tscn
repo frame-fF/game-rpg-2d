@@ -17,4 +17,4 @@ polygon = PackedVector2Array(-100, -20, 54.771606, -20.000061, 100, -20, 100, 20
 uv = PackedVector2Array(-100, -20, 100, -20, 100, 20, -100, 20)
 
 [node name="Player" parent="." unique_id=478418677 instance=ExtResource("1_jkcsq")]
-position = Vector2(-200, 0)
+position = Vector2(0, -100)
