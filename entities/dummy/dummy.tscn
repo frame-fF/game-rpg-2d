@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://03g1ctukxysw"]
+
+[ext_resource type="Script" uid="uid://d2jhiegoyka4l" path="res://entities/dummy/dummy.gd" id="1_nih5e"]
+[ext_resource type="Resource" uid="uid://b4ea1lsh2vder" path="res://entities/dummy/dummy_stats.tres" id="2_vlfdi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
+size = Vector2(30, 60)
+
+[node name="Dummy" type="StaticBody2D" unique_id=406471295]
+script = ExtResource("1_nih5e")
+stats = ExtResource("2_vlfdi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=32395898]
+shape = SubResource("RectangleShape2D_5efxa")

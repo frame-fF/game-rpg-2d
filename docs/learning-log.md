@@ -173,6 +173,21 @@ func _ready() -> void:
 
 **Control node ต้องรู้:** ProgressBar/Control มี **Minimum Size** จาก Theme เริ่มต้น ถ้าตั้ง Size เล็กกว่าค่าต่ำสุด (เช่นตั้ง height 24 ทั้งที่ขั้นต่ำ 27) Godot จะดันกลับไปที่ค่าต่ำสุดอัตโนมัติ ไม่ใช่บั๊ก
 
+### 3.8 ระบบต่อสู้พื้นฐาน (Dummy เป้านิ่ง)
+
+**สถาปัตยกรรม:** local/single-player ล้วนๆ ตอนนี้ (คำนวณ damage ฝั่ง client ตรงๆ) — ตาม docs Phase 1 บอกไว้ไม่ต้องคิดเรื่อง server-authority จนกว่าจะถึง Phase 3
+
+- เพิ่ม `attack_power: int = 10` เข้า `StatsData` เดิม (ใช้ resource เดียวกัน ไม่แยกไฟล์ใหม่)
+- เพิ่ม Input Action `attack` (ปุ่ม Z) ผ่าน Project Settings → Input Map (ไม่มีให้มาเป็นค่าเริ่มต้นเหมือน `ui_*`)
+- Player มี **`AttackArea` (Area2D + CollisionShape2D)** เป็นลูก อยู่ห่างจากตัว `(20, 0)` — ตำแหน่ง x สลับเป็นบวก/ลบตาม `facing_direction` ทุกเฟรม เพื่อให้กล่องโจมตีอยู่ด้านหน้าเสมอไม่ว่าจะหันซ้ายขวา
+- `Dummy` (`entities/dummy/dummy.tscn`) = `StaticBody2D` + `StatsData` ของตัวเอง (`dummy_stats.tres`) มีฟังก์ชัน `take_damage(amount)` ลด HP แล้วเช็คตาย → `queue_free()`
+- Player เรียก `attack_area.get_overlapping_bodies()` ตอนกดปุ่ม `attack` วนเช็คว่า body ไหนมีฟังก์ชัน `take_damage` (เช็คด้วย `has_method()` กันเรียกฟังก์ชันที่ไม่มีจริง) แล้วส่ง `stats.attack_power` เข้าไปเป็นดาเมจ
+
+**concept ใหม่ที่ใช้:**
+- `Area2D` ต่างจาก `CollisionShape2D` บน CharacterBody2D/StaticBody2D ตรงที่แค่ "ตรวจจับการทับซ้อน" ไม่ผลัก/ไม่หยุดการเคลื่อนที่จริง เหมาะกับ hitbox/hurtbox/trigger
+- `body.has_method("ชื่อฟังก์ชัน")` — เช็คก่อนเรียกฟังก์ชันแบบไดนามิก ป้องกัน error ถ้า body ที่ทับซ้อนไม่มีฟังก์ชันนั้นจริง (เช่นไปโดนกำแพงที่ไม่มี `take_damage`)
+- **ตั้งชื่อตัวแปรชนกับฟังก์ชัน built-in ได้แบบไม่มี error แต่มี warning**: ตั้ง `exp` ใน StatsData ชนกับ `exp()` (ฟังก์ชันเลขยกกำลัง e ของ GDScript) — ไม่พังแต่ควรเปลี่ยนชื่อเป็น `experience` กันสับสน
+
 ---
 
 ## 4. Input Actions ที่ใช้
@@ -182,6 +197,7 @@ func _ready() -> void:
 | `ui_left`, `ui_right` | มีให้แล้ว (ค่าเริ่มต้นของ Godot) | เดินซ้าย-ขวา |
 | `ui_accept` | มีให้แล้ว (Space/Enter) | กระโดด |
 | `dash` | **ต้องสร้างเอง** ผ่าน Project Settings → Input Map | พุ่ง (ผูกปุ่ม Shift) |
+| `attack` | **ต้องสร้างเอง** ผ่าน Project Settings → Input Map | โจมตี (ผูกปุ่ม Z) |
 
 ---
 
@@ -233,7 +249,7 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 
 - [x] Movement + collision (เดิน, กระโดด, พุ่ง, ชนกำแพง)
 - [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP เสร็จแล้ว (ยังไม่ live-update รอระบบต่อสู้)
-- [ ] ระบบต่อสู้พื้นฐาน (attack, damage formula, death)
+- [x] ระบบต่อสู้พื้นฐาน — โจมตี Dummy ด้วย Area2D hitbox, ลด HP, ตายแล้ว `queue_free()` (ยังไม่มี damage formula ซับซ้อน แค่ค่าคงที่ `attack_power`, ยังไม่มี animation โจมตี)
 - [ ] Inventory + Item pickup/ใช้ไอเทม
 - [ ] Skill system (cooldown, mana cost, effect)
 - [ ] Save/Load ตัวละคร (local ก่อน)
