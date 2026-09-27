@@ -21,14 +21,12 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var face_sprite: AnimatedSprite2D = $FaceSprite
 @export var appearance: AppearanceData
 
-var base_attack_power: int = 0
 @export var inventory: InventoryData
 
 func _ready() -> void:
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
-	base_attack_power = stats.attack_power
 	appearance.changed.connect(_apply_appearance)
 	_apply_appearance()
 
@@ -92,14 +90,15 @@ func _physics_process(_delta: float) -> void:
 
 
 func _attack() -> void:
+	var damage := stats.attack_power + inventory.get_attack_bonus()
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage"):
-			body.take_damage(stats.attack_power)
+			body.take_damage(damage)
+
 
 func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	var frames: SpriteFrames = item.sprite_frames if item else null
 	if slot == "weapon":
-		stats.attack_power = base_attack_power + (item.attack_bonus if item else 0)
 		weapon_sprite.sprite_frames = frames
 	elif slot == "armor":
 		armor_sprite.sprite_frames = frames
