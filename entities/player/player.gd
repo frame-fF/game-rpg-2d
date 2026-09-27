@@ -24,6 +24,8 @@ var equipped_armor: EquipmentData
 var base_attack_power: int = 0
 
 func _ready() -> void:
+	animated_sprite.frame_changed.connect(_sync_armor)
+	animated_sprite.animation_changed.connect(_sync_armor)
 	base_attack_power = stats.attack_power
 	if starting_armor:
 		equip_armor(starting_armor)
@@ -86,9 +88,6 @@ func _physics_process(_delta: float) -> void:
 	else:
 		animated_sprite.play("idle")
 
-	if equipped_armor:
-		armor_sprite.animation = animated_sprite.animation
-		armor_sprite.frame = animated_sprite.frame
 
 func _attack() -> void:
 	for body in attack_area.get_overlapping_bodies():
@@ -103,4 +102,9 @@ func equip_armor(item: EquipmentData) -> void:
 	equipped_armor = item
 	armor_sprite.sprite_frames = item.sprite_frames
 	armor_sprite.visible = true
-	armor_sprite.animation = animated_sprite.animation
+	_sync_armor()
+
+func _sync_armor() -> void:
+	if equipped_armor:
+		armor_sprite.animation = animated_sprite.animation
+		armor_sprite.frame = animated_sprite.frame

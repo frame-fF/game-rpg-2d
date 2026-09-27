@@ -2,22 +2,24 @@
 
 [ext_resource type="Script" uid="uid://c8dqp2oknl502" path="res://entities/player/player.gd" id="1_symyc"]
 [ext_resource type="Resource" uid="uid://d4fbfjbrm5dsm" path="res://entities/player/player_stats.tres" id="2_3wlsy"]
-[ext_resource type="Texture2D" uid="uid://ce5hxe71m4stw" path="res://entities/player/sprites/base_body_m/9.png" id="2_yqrof"]
-[ext_resource type="Texture2D" uid="uid://c7m1p28c68u7b" path="res://entities/player/sprites/base_body_m/10.png" id="3_3wlsy"]
 [ext_resource type="Resource" uid="uid://c1j4kttfsbex1" path="res://items/armor/blood_crow_armor.tres" id="3_wuv6x"]
-[ext_resource type="Texture2D" uid="uid://dx5vmtmsam2ut" path="res://entities/player/sprites/base_body_m/11.png" id="4_b2kln"]
 [ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/weapon_01.tres" id="4_qpopc"]
 [ext_resource type="Texture2D" uid="uid://cw8yadurjvpjm" path="res://entities/player/sprites/base_body_m/22.png" id="5_221hk"]
-[ext_resource type="Texture2D" uid="uid://d64ns3rctcnq" path="res://entities/player/sprites/base_body_m/12.png" id="8_221hk"]
+[ext_resource type="Texture2D" uid="uid://6oak3vtdejck" path="res://entities/player/sprites/base_body_m/dash_0.png" id="6_mtric"]
+[ext_resource type="Texture2D" uid="uid://dyg8dq5qa5xen" path="res://entities/player/sprites/base_body_m/dash_1.png" id="7_221hk"]
+[ext_resource type="Texture2D" uid="uid://b5tlyc61ordvl" path="res://entities/player/sprites/base_body_m/dash_2.png" id="8_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://chnls5r0srbr4" path="res://entities/player/sprites/base_body_m/idle_0.png" id="9_221hk"]
-[ext_resource type="Texture2D" uid="uid://dtxrirrxad1cb" path="res://entities/player/sprites/base_body_m/13.png" id="9_ghoj8"]
-[ext_resource type="Texture2D" uid="uid://vreg2twtcnii" path="res://entities/player/sprites/base_body_m/15.png" id="10_b2kln"]
 [ext_resource type="Texture2D" uid="uid://b3lcu5teqn5wg" path="res://entities/player/sprites/base_body_m/idle_1.png" id="10_ghoj8"]
-[ext_resource type="Texture2D" uid="uid://cad8c07p3cw7y" path="res://entities/player/sprites/base_body_m/14.png" id="10_t1t22"]
 [ext_resource type="Texture2D" uid="uid://ba1msrpgliwqq" path="res://entities/player/sprites/base_body_m/idle_2.png" id="11_t1t22"]
+[ext_resource type="Texture2D" uid="uid://b1oex6aacg5x3" path="res://entities/player/sprites/base_body_m/jump_0.png" id="12_eyb6c"]
+[ext_resource type="Texture2D" uid="uid://brlv3jschpq1d" path="res://entities/player/sprites/base_body_m/jump_1.png" id="13_221hk"]
+[ext_resource type="Texture2D" uid="uid://b6yy62fdbxbqo" path="res://entities/player/sprites/base_body_m/jump_2.png" id="14_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://dl0vdq8ajpexj" path="res://entities/player/sprites/base_body_m/walk_0.png" id="16_we0b7"]
 [ext_resource type="Texture2D" uid="uid://c0l3gr1cye4x4" path="res://entities/player/sprites/base_body_m/walk_1.png" id="17_mtric"]
 [ext_resource type="Texture2D" uid="uid://dh75r2w6w3xkc" path="res://entities/player/sprites/base_body_m/walk_2.png" id="18_eyb6c"]
+[ext_resource type="Texture2D" uid="uid://c7cj4w0ott6ca" path="res://entities/player/sprites/base_body_m/walk_3.png" id="19_221hk"]
+[ext_resource type="Texture2D" uid="uid://pw5cc3wb88v5" path="res://entities/player/sprites/base_body_m/walk_4.png" id="20_ghoj8"]
+[ext_resource type="Texture2D" uid="uid://cig8sxjawr56m" path="res://entities/player/sprites/base_body_m/walk_5.png" id="21_t1t22"]
 [ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/blood_crow_frames.tres" id="24_t1t22"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_v0b18"]
@@ -32,13 +34,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_yqrof")
+"texture": ExtResource("6_mtric")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_3wlsy")
+"texture": ExtResource("7_221hk")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_b2kln")
+"texture": ExtResource("8_ghoj8")
 }],
 "loop": 1,
 "name": &"dash",
@@ -60,16 +62,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("8_221hk")
+"texture": ExtResource("12_eyb6c")
 }, {
 "duration": 1.0,
-"texture": ExtResource("10_b2kln")
+"texture": ExtResource("13_221hk")
 }, {
 "duration": 1.0,
-"texture": ExtResource("9_ghoj8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_t1t22")
+"texture": ExtResource("14_ghoj8")
 }],
 "loop": 1,
 "name": &"jump",
@@ -84,6 +83,15 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("18_eyb6c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_221hk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_ghoj8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_t1t22")
 }],
 "loop": 1,
 "name": &"walk",
@@ -104,11 +112,11 @@ starting_weapon = ExtResource("4_qpopc")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"walk"
+animation = &"jump"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
 sprite_frames = ExtResource("24_t1t22")
-animation = &"walk"
+animation = &"jump"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")
