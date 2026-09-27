@@ -9,8 +9,6 @@
 [ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/weapon_01.tres" id="4_qpopc"]
 [ext_resource type="Texture2D" uid="uid://cw8yadurjvpjm" path="res://entities/player/sprites/base_body_m/22.png" id="5_221hk"]
 [ext_resource type="Texture2D" uid="uid://v3uwsnr0wtls" path="res://entities/player/sprites/base_body_m/0.png" id="5_we0b7"]
-[ext_resource type="Texture2D" uid="uid://wa3b38amnq7x" path="res://entities/player/sprites/base_body_m/1.png" id="6_mtric"]
-[ext_resource type="Texture2D" uid="uid://bkyturs6mhtbv" path="res://entities/player/sprites/base_body_m/2.png" id="7_eyb6c"]
 [ext_resource type="Texture2D" uid="uid://d64ns3rctcnq" path="res://entities/player/sprites/base_body_m/12.png" id="8_221hk"]
 [ext_resource type="Texture2D" uid="uid://dtxrirrxad1cb" path="res://entities/player/sprites/base_body_m/13.png" id="9_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://vreg2twtcnii" path="res://entities/player/sprites/base_body_m/15.png" id="10_b2kln"]
@@ -50,12 +48,6 @@ animations = [{
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("5_we0b7")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_mtric")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_eyb6c")
 }],
 "loop": 1,
 "name": &"idle",
@@ -116,12 +108,12 @@ starting_weapon = ExtResource("4_qpopc")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"attack"
+animation = &"idle"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
-position = Vector2(0, 11.2)
+position = Vector2(0, 11)
 sprite_frames = ExtResource("24_t1t22")
-animation = &"attack"
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")
