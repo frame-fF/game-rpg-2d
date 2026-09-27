@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://c8dqp2oknl502" path="res://entities/player/player.gd" id="1_symyc"]
 [ext_resource type="Resource" uid="uid://d4fbfjbrm5dsm" path="res://entities/player/player_stats.tres" id="2_3wlsy"]
-[ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/weapon_01.tres" id="4_qpopc"]
 [ext_resource type="Resource" uid="uid://50dekp51o0oq" path="res://entities/player/player_inventory.tres" id="5_50fht"]
 [ext_resource type="Texture2D" uid="uid://bwsrj5nejdcsl" path="res://entities/player/sprites/base_body_m/attack_0.png" id="5_t1t22"]
 [ext_resource type="Texture2D" uid="uid://df0t1cd6fbpjn" path="res://entities/player/sprites/base_body_m/attack_1.png" id="6_50fht"]
@@ -23,7 +22,6 @@
 [ext_resource type="Texture2D" uid="uid://c7cj4w0ott6ca" path="res://entities/player/sprites/base_body_m/walk_3.png" id="19_221hk"]
 [ext_resource type="Texture2D" uid="uid://pw5cc3wb88v5" path="res://entities/player/sprites/base_body_m/walk_4.png" id="20_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://cig8sxjawr56m" path="res://entities/player/sprites/base_body_m/walk_5.png" id="21_t1t22"]
-[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/blood_crow_frames.tres" id="24_t1t22"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_v0b18"]
 animations = [{
@@ -119,16 +117,13 @@ size = Vector2(24, 40)
 [node name="Player" type="CharacterBody2D" unique_id=478418677]
 script = ExtResource("1_symyc")
 stats = ExtResource("2_3wlsy")
-starting_weapon = ExtResource("4_qpopc")
 inventory = ExtResource("5_50fht")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"attack"
+animation = &"walk"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
-sprite_frames = ExtResource("24_t1t22")
-animation = &"attack"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")
