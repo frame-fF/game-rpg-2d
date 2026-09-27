@@ -39,10 +39,10 @@ func _physics_process(_delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * _delta
 
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 
-	var direction: float = Input.get_axis("ui_left", "ui_right")
+	var direction: float = Input.get_axis("move_left", "move_right")
 	if direction != 0:
 		facing_direction = sign(direction)
 

@@ -26,6 +26,7 @@ func _refresh() -> void:
 		button.text = item.item_name
 		button.icon = item.icon
 		button.toggle_mode = true
+		button.focus_mode = Control.FOCUS_NONE
 		button.button_pressed = inventory.is_equipped(item)
 		button.pressed.connect(inventory.toggle_equip.bind(item))
 		grid.add_child(button)
