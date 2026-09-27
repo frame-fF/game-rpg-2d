@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://i04xigg1lngp"]
 
 [ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_bgha5"]
-[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/01/icon.png" id="1_ykiql"]
-[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/weapon_01_frames.tres" id="3_77v1d"]
+[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/1/icon.png" id="1_ykiql"]
+[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/weapon_1_frames.tres" id="3_77v1d"]
 
 [resource]
 script = ExtResource("1_bgha5")

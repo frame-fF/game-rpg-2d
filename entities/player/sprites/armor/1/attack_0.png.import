@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxjamxs5aioj5"
-path="res://.godot/imported/walk_1.png-02c4b22f9a4d335ae085ea6121b95c8c.ctex"
+uid="uid://ocikcqkklwqh"
+path="res://.godot/imported/attack_0.png-6ac155ea56a4799e2ea0368192c38f0b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/blood_crow_m/walk_1.png"
-dest_files=["res://.godot/imported/walk_1.png-02c4b22f9a4d335ae085ea6121b95c8c.ctex"]
+source_file="res://entities/player/sprites/armor/1/attack_0.png"
+dest_files=["res://.godot/imported/attack_0.png-6ac155ea56a4799e2ea0368192c38f0b.ctex"]
 
 [params]
 

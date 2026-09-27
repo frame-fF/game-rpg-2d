@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7xnknqbpk3o4"
-path="res://.godot/imported/walk_3.png-4ce27ccad0d80a8d8da1266dfb4ca5b4.ctex"
+uid="uid://b0cn472yx27ui"
+path="res://.godot/imported/dash_1.png-878b92c3abd2410aecaf9d561d488a86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/blood_crow_m/walk_3.png"
-dest_files=["res://.godot/imported/walk_3.png-4ce27ccad0d80a8d8da1266dfb4ca5b4.ctex"]
+source_file="res://entities/player/sprites/armor/1/dash_1.png"
+dest_files=["res://.godot/imported/dash_1.png-878b92c3abd2410aecaf9d561d488a86.ctex"]
 
 [params]
 

@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://c1j4kttfsbex1"]
 
 [ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_2ctjc"]
-[ext_resource type="Texture2D" uid="uid://y0uk0hxftxid" path="res://entities/player/sprites/armor/blood_crow_m/icon.png" id="1_cq2fu"]
-[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/blood_crow_frames.tres" id="2_jylhi"]
+[ext_resource type="Texture2D" uid="uid://y0uk0hxftxid" path="res://entities/player/sprites/armor/1/icon.png" id="1_cq2fu"]
+[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/armor_1_frames.tres" id="2_jylhi"]
 
 [resource]
 script = ExtResource("1_2ctjc")

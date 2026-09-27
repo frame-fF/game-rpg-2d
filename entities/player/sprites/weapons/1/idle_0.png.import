@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ocikcqkklwqh"
-path="res://.godot/imported/attack_0.png-2b97c9006aa176950f4cac57ba5ed17b.ctex"
+uid="uid://djjkjtcyi3h2w"
+path="res://.godot/imported/idle_0.png-d2df4de0af3a39346e381dd5de9d7c5e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/blood_crow_m/attack_0.png"
-dest_files=["res://.godot/imported/attack_0.png-2b97c9006aa176950f4cac57ba5ed17b.ctex"]
+source_file="res://entities/player/sprites/weapons/1/idle_0.png"
+dest_files=["res://.godot/imported/idle_0.png-d2df4de0af3a39346e381dd5de9d7c5e.ctex"]
 
 [params]
 
