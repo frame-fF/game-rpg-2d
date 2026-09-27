@@ -17,6 +17,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var stats: StatsData
 @onready var attack_area: Area2D = $AttackArea
 @onready var armor_sprite: AnimatedSprite2D = $ArmorSprite
+@onready var weapon_sprite: AnimatedSprite2D = $WeaponSprite
 @export var starting_armor: EquipmentData
 @export var starting_weapon: EquipmentData
 var equipped_weapon: EquipmentData
@@ -26,8 +27,8 @@ var base_attack_power: int = 0
 
 func _ready() -> void:
 	inventory.equip_requested.connect(equip)
-	animated_sprite.frame_changed.connect(_sync_armor)
-	animated_sprite.animation_changed.connect(_sync_armor)
+	animated_sprite.frame_changed.connect(_sync_layers)
+	animated_sprite.animation_changed.connect(_sync_layers)
 	base_attack_power = stats.attack_power
 	if starting_armor:
 		equip_armor(starting_armor)
@@ -75,6 +76,7 @@ func _physics_process(_delta: float) -> void:
 
 	animated_sprite.flip_h = facing_direction < 0
 	armor_sprite.flip_h = facing_direction < 0
+	weapon_sprite.flip_h = facing_direction < 0
 	attack_area.position.x = 20 * facing_direction
 
 
@@ -105,14 +107,23 @@ func equip(item: EquipmentData) -> void:
 func equip_weapon(item: EquipmentData) -> void:
 	equipped_weapon = item
 	stats.attack_power = base_attack_power + item.attack_bonus
+	weapon_sprite.sprite_frames = item.sprite_frames
+	_sync_layers()
 
 func equip_armor(item: EquipmentData) -> void:
 	equipped_armor = item
 	armor_sprite.sprite_frames = item.sprite_frames
-	armor_sprite.visible = true
-	_sync_armor()
+	_sync_layers()
 
-func _sync_armor() -> void:
-	if equipped_armor:
-		armor_sprite.animation = animated_sprite.animation
-		armor_sprite.frame = animated_sprite.frame
+func _sync_layers() -> void:
+	for layer in [armor_sprite, weapon_sprite]:
+		_sync_layer(layer)
+
+func _sync_layer(layer: AnimatedSprite2D) -> void:
+	var anim := animated_sprite.animation
+	if layer.sprite_frames and layer.sprite_frames.has_animation(anim):
+		layer.visible = true
+		layer.animation = anim
+		layer.frame = animated_sprite.frame
+	else:
+		layer.visible = false

@@ -125,6 +125,8 @@ animation = &"walk"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
 
+[node name="WeaponSprite" type="AnimatedSprite2D" parent="." unique_id=196249317]
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")
 
