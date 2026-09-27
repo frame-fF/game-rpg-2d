@@ -18,6 +18,8 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var attack_area: Area2D = $AttackArea
 @onready var armor_sprite: AnimatedSprite2D = $ArmorSprite
 @onready var weapon_sprite: AnimatedSprite2D = $WeaponSprite
+@onready var face_sprite: AnimatedSprite2D = $FaceSprite
+@export var appearance: AppearanceData
 
 var base_attack_power: int = 0
 @export var inventory: InventoryData
@@ -27,6 +29,8 @@ func _ready() -> void:
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
 	base_attack_power = stats.attack_power
+	appearance.changed.connect(_apply_appearance)
+	_apply_appearance()
 
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
@@ -70,6 +74,7 @@ func _physics_process(_delta: float) -> void:
 	animated_sprite.flip_h = facing_direction < 0
 	armor_sprite.flip_h = facing_direction < 0
 	weapon_sprite.flip_h = facing_direction < 0
+	face_sprite.flip_h = facing_direction < 0
 	attack_area.position.x = 20 * facing_direction
 
 
@@ -100,8 +105,12 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 		armor_sprite.sprite_frames = frames
 	_sync_layers()
 
+func _apply_appearance() -> void:
+	face_sprite.sprite_frames = appearance.face
+	_sync_layers()
+
 func _sync_layers() -> void:
-	for layer in [armor_sprite, weapon_sprite]:
+	for layer in [face_sprite, armor_sprite, weapon_sprite]:
 		_sync_layer(layer)
 
 func _sync_layer(layer: AnimatedSprite2D) -> void:
