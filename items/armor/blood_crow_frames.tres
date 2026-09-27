@@ -1,10 +1,6 @@
 [gd_resource type="SpriteFrames" format=3 uid="uid://bbb6yjl8maqgo"]
 
-[ext_resource type="Texture2D" uid="uid://dhhu7t0wb50mo" path="res://entities/player/armor/blood_crow_ceremonial_m/24.png" id="1_dbrj2"]
-[ext_resource type="Texture2D" uid="uid://bbqkxvuuvuowj" path="res://entities/player/armor/blood_crow_ceremonial_m/25.png" id="2_sv7u3"]
-[ext_resource type="Texture2D" uid="uid://vrbpifwtihrl" path="res://entities/player/armor/blood_crow_ceremonial_m/26.png" id="3_ccnvr"]
-[ext_resource type="Texture2D" uid="uid://dbtm2iq7cka2l" path="res://entities/player/armor/blood_crow_ceremonial_m/27.png" id="4_h6vpy"]
-[ext_resource type="Texture2D" uid="uid://d1b5l808ly40q" path="res://entities/player/armor/blood_crow_ceremonial_m/28.png" id="5_mrgpx"]
+[ext_resource type="Texture2D" uid="uid://mudeup233okf" path="res://entities/player/armor/blood_crow_ceremonial_m/22.png" id="2_jesip"]
 [ext_resource type="Texture2D" uid="uid://x6moluqm381h" path="res://entities/player/armor/blood_crow_ceremonial_m/9.png" id="6_q5c23"]
 [ext_resource type="Texture2D" uid="uid://drve0tux747an" path="res://entities/player/armor/blood_crow_ceremonial_m/10.png" id="7_wm1c0"]
 [ext_resource type="Texture2D" uid="uid://b5veqamvwb3qp" path="res://entities/player/armor/blood_crow_ceremonial_m/11.png" id="8_wank0"]
@@ -26,19 +22,7 @@
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_dbrj2")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_sv7u3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_ccnvr")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_h6vpy")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_mrgpx")
+"texture": ExtResource("2_jesip")
 }],
 "loop": 1,
 "name": &"attack",

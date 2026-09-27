@@ -71,7 +71,7 @@ func _physics_process(_delta: float) -> void:
 
 	animated_sprite.flip_h = facing_direction < 0
 	armor_sprite.flip_h = facing_direction < 0
-	armor_sprite.position.x = -1 * facing_direction
+	armor_sprite.position.x = -1.7 * facing_direction
 	attack_area.position.x = 20 * facing_direction
 
 
@@ -87,7 +87,8 @@ func _physics_process(_delta: float) -> void:
 		animated_sprite.play("idle")
 
 	if equipped_armor:
-		armor_sprite.play(animated_sprite.animation)
+		armor_sprite.animation = animated_sprite.animation
+		armor_sprite.frame = animated_sprite.frame
 
 func _attack() -> void:
 	for body in attack_area.get_overlapping_bodies():
@@ -102,4 +103,4 @@ func equip_armor(item: EquipmentData) -> void:
 	equipped_armor = item
 	armor_sprite.sprite_frames = item.sprite_frames
 	armor_sprite.visible = true
-	armor_sprite.play(animated_sprite.animation)
+	armor_sprite.animation = animated_sprite.animation
