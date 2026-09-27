@@ -8,17 +8,16 @@
 [ext_resource type="Texture2D" uid="uid://dx5vmtmsam2ut" path="res://entities/player/sprites/base_body_m/11.png" id="4_b2kln"]
 [ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/weapon_01.tres" id="4_qpopc"]
 [ext_resource type="Texture2D" uid="uid://cw8yadurjvpjm" path="res://entities/player/sprites/base_body_m/22.png" id="5_221hk"]
-[ext_resource type="Texture2D" uid="uid://v3uwsnr0wtls" path="res://entities/player/sprites/base_body_m/0.png" id="5_we0b7"]
 [ext_resource type="Texture2D" uid="uid://d64ns3rctcnq" path="res://entities/player/sprites/base_body_m/12.png" id="8_221hk"]
+[ext_resource type="Texture2D" uid="uid://chnls5r0srbr4" path="res://entities/player/sprites/base_body_m/idle_0.png" id="9_221hk"]
 [ext_resource type="Texture2D" uid="uid://dtxrirrxad1cb" path="res://entities/player/sprites/base_body_m/13.png" id="9_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://vreg2twtcnii" path="res://entities/player/sprites/base_body_m/15.png" id="10_b2kln"]
+[ext_resource type="Texture2D" uid="uid://b3lcu5teqn5wg" path="res://entities/player/sprites/base_body_m/idle_1.png" id="10_ghoj8"]
 [ext_resource type="Texture2D" uid="uid://cad8c07p3cw7y" path="res://entities/player/sprites/base_body_m/14.png" id="10_t1t22"]
-[ext_resource type="Texture2D" uid="uid://dm0re8oon8nl" path="res://entities/player/sprites/base_body_m/3.png" id="11_50fht"]
-[ext_resource type="Texture2D" uid="uid://cfgqwot1yus21" path="res://entities/player/sprites/base_body_m/4.png" id="12_wuv6x"]
-[ext_resource type="Texture2D" uid="uid://de4ij4iwnulm0" path="res://entities/player/sprites/base_body_m/5.png" id="13_qpopc"]
-[ext_resource type="Texture2D" uid="uid://b5upe7sikjgn3" path="res://entities/player/sprites/base_body_m/6.png" id="14_wq0jh"]
-[ext_resource type="Texture2D" uid="uid://luhekq5roh1m" path="res://entities/player/sprites/base_body_m/7.png" id="15_gt4e4"]
-[ext_resource type="Texture2D" uid="uid://dv4wh54qaatjn" path="res://entities/player/sprites/base_body_m/8.png" id="16_24ehl"]
+[ext_resource type="Texture2D" uid="uid://ba1msrpgliwqq" path="res://entities/player/sprites/base_body_m/idle_2.png" id="11_t1t22"]
+[ext_resource type="Texture2D" uid="uid://dl0vdq8ajpexj" path="res://entities/player/sprites/base_body_m/walk_0.png" id="16_we0b7"]
+[ext_resource type="Texture2D" uid="uid://c0l3gr1cye4x4" path="res://entities/player/sprites/base_body_m/walk_1.png" id="17_mtric"]
+[ext_resource type="Texture2D" uid="uid://dh75r2w6w3xkc" path="res://entities/player/sprites/base_body_m/walk_2.png" id="18_eyb6c"]
 [ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/blood_crow_frames.tres" id="24_t1t22"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_v0b18"]
@@ -47,7 +46,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_we0b7")
+"texture": ExtResource("9_221hk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_ghoj8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_t1t22")
 }],
 "loop": 1,
 "name": &"idle",
@@ -72,22 +77,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("11_50fht")
+"texture": ExtResource("16_we0b7")
 }, {
 "duration": 1.0,
-"texture": ExtResource("12_wuv6x")
+"texture": ExtResource("17_mtric")
 }, {
 "duration": 1.0,
-"texture": ExtResource("13_qpopc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_wq0jh")
-}, {
-"duration": 1.0,
-"texture": ExtResource("15_gt4e4")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_24ehl")
+"texture": ExtResource("18_eyb6c")
 }],
 "loop": 1,
 "name": &"walk",
@@ -95,7 +91,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yqrof"]
-size = Vector2(36, 77)
+size = Vector2(41, 82)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v0b18"]
 size = Vector2(24, 40)
@@ -108,12 +104,11 @@ starting_weapon = ExtResource("4_qpopc")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"idle"
+animation = &"walk"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
-position = Vector2(0, 11)
 sprite_frames = ExtResource("24_t1t22")
-animation = &"idle"
+animation = &"walk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")
