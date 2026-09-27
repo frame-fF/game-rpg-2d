@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("1_bgha5")
-item_name = "weapon01"
+item_name = "Weapon_1"
 icon = ExtResource("1_ykiql")
 slot = "weapon"
 attack_bonus = 5

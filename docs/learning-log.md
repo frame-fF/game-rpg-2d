@@ -50,15 +50,28 @@
 ### 3.1 โครงสร้างโปรเจกต์ (Feature-based)
 จัดกลุ่มไฟล์ตาม "ฟีเจอร์" ไม่ใช่ตาม "ชนิดไฟล์" (ห้ามมีโฟลเดอร์ `/scripts`, `/sprites` แยกต่างหาก):
 ```
+data/                          ← สคริปต์แม่แบบ Resource (class_name) ใช้ร่วมกันทั้งเกม
+├── stats_data.gd
+├── equipment_data.gd
+└── inventory_data.gd
+items/                         ← ข้อมูลไอเทมจริง (.tres) = ตัวไอเทม + SpriteFrames ของมัน
+├── armor/   armor_1.tres, armor_1_frames.tres
+└── weapons/ weapon_1.tres, weapon_1_frames.tres
 entities/player/
-├── player.tscn
-├── player.gd
-└── sprites/base_body_m/   ← เฟรม animation ทั้งหมดของ player อยู่รวมกัน
-data/
-└── stats_data.gd          ← Resource template ใช้ร่วมกันทั้งเกม (Player/Monster)
-levels/
-└── village.tscn           ← ด่านทดสอบ
+├── player.tscn, player.gd
+├── player_stats.tres, player_inventory.tres
+└── sprites/
+    ├── base_body_m/           ← เฟรมตัว (idle_0, walk_3, ...)
+    ├── armor/1/               ← เฟรมชุด + icon.png
+    └── weapons/1/             ← เฟรมดาบ + icon.png
+entities/dummy/                ← dummy.tscn, dummy.gd, dummy_stats.tres
+ui/hud/, ui/inventory/
+levels/village.tscn            ← ด่านทดสอบ
 ```
+**กติกาตั้งชื่อ:**
+- ไอเทม 1 ชิ้น = 1 โฟลเดอร์รูป (เฟรมทุกท่า + `icon.png`) + 2 ไฟล์ใน `items/` (`<ประเภท>_<เลข>.tres` + `<ประเภท>_<เลข>_frames.tres`)
+- ใช้**เลขล้วน** ไม่เติม 0 นำหน้า (`1`, `2` ไม่ใช่ `01`) และใช้แบบเดียวกันทั้งชุดและอาวุธ
+- ชื่อเฟรมตามท่า `<ท่า>_<ลำดับ>.png` (`idle_0`, `walk_5`) อ่านง่ายกว่าเลข `0.png`-`57.png` ของ asset ดิบ
 
 ### 3.2 สร้างตัวละคร Player
 1. New Scene → Root Type = **CharacterBody2D** (ไม่ใช่ Node เฉยๆ — เลือกผิดแล้วแก้ทีหลังด้วย **Change Type...** ได้)
@@ -204,42 +217,66 @@ class_name EquipmentData
 @export var attack_bonus: int = 0
 @export var sprite_frames: SpriteFrames # เฉพาะ armor ใช้
 ```
-ไฟล์ `.tres` จริง (ตัวข้อมูล ไม่ใช่แม่แบบ) เก็บที่ **`items/`** แยกจาก `data/` (แม่แบบสคริปต์) — `items/armor/`, `items/weapons/` — คนละที่กับไฟล์รูปดิบที่อยู่ `entities/player/armor/`, `entities/player/weapons/` (จัดกลุ่มไฟล์รูปตาม feature/ตัวละคร, จัดกลุ่ม `.tres` ตามหน้าที่ "เป็นไอเทม")
+ไฟล์ `.tres` จริง (ตัวข้อมูล ไม่ใช่แม่แบบ) เก็บที่ **`items/`** แยกจาก `data/` (แม่แบบสคริปต์) ส่วนไฟล์รูปอยู่ `entities/player/sprites/armor/<เลข>/`, `.../weapons/<เลข>/` (ดูโครงสร้างที่ 3.1)
 
-**Layered Sprite (ซ้อนภาพชุดเกราะบน Body):**
+อาวุธก็มี `sprite_frames` ได้เหมือนชุด (ถ้ามีเฟรมดาบในมือ) — ไม่ต้องแยก field
+
+**Layered Sprite (ซ้อนหลายเลเยอร์บน Body):**
 ```
 Player (CharacterBody2D)
-├── AnimatedSprite2D   ← Body
-├── ArmorSprite         ← ใหม่ อยู่ใต้ Body ในลิสต์ (Godot วาด sibling หลังทับ sibling ก่อน)
+├── AnimatedSprite2D   ← Body (ผู้คุมเฟรม)
+├── ArmorSprite        ← ชุด (ลำดับในลิสต์ = ลำดับการวาด ตัวล่างวาดทับตัวบน)
+├── WeaponSprite       ← ดาบ วาดทับชุด
 ├── CollisionShape2D
 ├── Camera2D
 └── AttackArea
 ```
-- ทั้งสอง sprite อยู่ตำแหน่ง **`(0, 0)`** ใช้ **Centered = true** (ค่า default) — ไม่ต้องมี offset ในโค้ดเลย เพราะรูปชุดถูกจัดให้กรอบตรงกับรูปตัวมาตั้งแต่ใน Aseprite (ดูหัวข้อ "เตรียมรูปใน Aseprite" ด้านล่าง)
-- SpriteFrames ของ ArmorSprite ต้องมี **animation ชื่อตรงกับ Body ทุกตัว** และ**จำนวนเฟรมเท่ากัน ลำดับเดียวกัน**
-- ชุด**ไม่ `play()` เอง** — ใช้ signal ให้ตัวเป็นผู้คุม (ดูโค้ดด้านล่าง) + `flip_h` ตามตัวทุกเฟรม
+- ทุกเลเยอร์อยู่ตำแหน่ง **`(0, 0)`** ใช้ **Centered = true** (ค่า default) — ไม่ต้องมี offset ในโค้ด เพราะรูปถูกจัดให้กรอบตรงกับรูปตัวมาตั้งแต่ใน Aseprite
+- **node เลเยอร์ต้องว่างใน scene** (ไม่ตั้ง Sprite Frames ไว้ล่วงหน้า) — รูปจะมาจาก `EquipmentData` ตอนกดใส่ ถ้าตั้งค้างไว้ จะโชว์ภาพนิ่งทั้งที่ยังไม่ได้ใส่ของ (ขึ้น ⚠️ "no SpriteFrames" ในเอดิเตอร์เป็นเรื่องปกติ)
+- ชื่อท่าใน SpriteFrames ของเลเยอร์ต้องตรงกับ Body (`idle`, `walk`, ...) ถ้าเลเยอร์ไหน**ยังไม่มีท่านั้น** โค้ดจะซ่อนเลเยอร์นั้นแทนที่จะขึ้น error (ทำเฟรมเพิ่มทีละท่าได้)
 
-**โค้ด sync ชุดกับตัว (แบบถูกหลักการ):**
+**โค้ด sync ทุกเลเยอร์ (แบบถูกหลักการ):**
 ```gdscript
+@onready var armor_sprite: AnimatedSprite2D = $ArmorSprite
+@onready var weapon_sprite: AnimatedSprite2D = $WeaponSprite
+
 func _ready() -> void:
-	animated_sprite.frame_changed.connect(_sync_armor)
-	animated_sprite.animation_changed.connect(_sync_armor)
+	animated_sprite.frame_changed.connect(_sync_layers)
+	animated_sprite.animation_changed.connect(_sync_layers)
 	...
+
+func equip_weapon(item: EquipmentData) -> void:
+	equipped_weapon = item
+	stats.attack_power = base_attack_power + item.attack_bonus
+	weapon_sprite.sprite_frames = item.sprite_frames
+	_sync_layers()
 
 func equip_armor(item: EquipmentData) -> void:
 	equipped_armor = item
 	armor_sprite.sprite_frames = item.sprite_frames
-	armor_sprite.visible = true
-	_sync_armor()
+	_sync_layers()
 
-func _sync_armor() -> void:
-	if equipped_armor:
-		armor_sprite.animation = animated_sprite.animation
-		armor_sprite.frame = animated_sprite.frame
+func _sync_layers() -> void:
+	for layer in [armor_sprite, weapon_sprite]:
+		_sync_layer(layer)
+
+func _sync_layer(layer: AnimatedSprite2D) -> void:
+	var anim := animated_sprite.animation
+	if layer.sprite_frames and layer.sprite_frames.has_animation(anim):
+		layer.visible = true
+		layer.animation = anim
+		layer.frame = animated_sprite.frame
+	else:
+		layer.visible = false
 ```
-และใน `_physics_process`: `armor_sprite.flip_h = facing_direction < 0` คู่กับของตัว
-- **หลักการ:** ตัว (Body) เป็นเจ้าของเฟรมคนเดียว (single source of truth) ชุดแค่ลอกตาม และใช้ **signal** (ยิงทันทีตอนตัวเปลี่ยนเฟรม) แทนการเช็คทุกเฟรม → ตรงกันเป๊ะ ไม่มีช่องว่างให้กระพริบ
-- วันหน้าเพิ่มผม/ตา: เพิ่ม AnimatedSprite2D อีก node แล้วเพิ่มบรรทัดใน `_sync_armor()` (หรือวนลูปทุกเลเยอร์)
+และใน `_physics_process`: `armor_sprite.flip_h` / `weapon_sprite.flip_h = facing_direction < 0` คู่กับของตัว
+- **หลักการ:** ตัว (Body) เป็นเจ้าของเฟรมคนเดียว (single source of truth) เลเยอร์อื่นแค่ลอกตาม และใช้ **signal** (ยิงทันทีตอนตัวเปลี่ยนเฟรม) แทนการเช็คทุกเฟรม → ตรงกันเป๊ะ ไม่มีช่องว่างให้กระพริบ
+- วันหน้าเพิ่มผม/ตา: เพิ่ม AnimatedSprite2D อีก node แล้วเพิ่มชื่อเข้าไปใน `[armor_sprite, weapon_sprite]`
+
+**ดาบติดมือ:** asset ที่มีเป็นแค่ไอคอนนิ่ง (`Weapons.png` ตาราง 31x31 ช่องละ 38px) ไม่มีเฟรมตามท่า → ทำเองใน Aseprite: วางไอคอนบนเลเยอร์ใหม่เหนือรูปตัว ขยับ/หมุนให้อยู่ในมือทีละเฟรม แล้ว export แบบเดียวกับชุด
+- หมุนใน Aseprite: ตอนภาพยังลอยอยู่ พิมพ์องศาในช่อง `R:` หรือลากจากนอกมุมกรอบ, พลิก Shift+H / Shift+V
+- เปลี่ยนโหมดหมุนจาก `Fast Rotation` เป็น **`RotSprite`** ก่อนหมุน ไม่งั้นขอบภาพ pixel art แตกหยัก
+- หาช่องไอคอนในตารางใหญ่: เรนเดอร์ช่องพร้อมเลข `แถว,คอลัมน์` กำกับแล้วมองหาด้วยตา (การเทียบภาพอัตโนมัติพลาดง่ายถ้าภาพอ้างอิงถูกขยาย/ครอปต่างกัน)
 
 **เตรียมรูปใน Aseprite (ทำครั้งเดียวต่อเฟรม ต่อชุด):**
 1. เปิดรูปตัว (Base Body) เป็นฐาน
@@ -281,6 +318,82 @@ func _sync_armor() -> void:
 - **ไม่ควรเก็บ config MCP ใน `.mcp.json` ของโปรเจกต์** เพราะมี path เฉพาะเครื่อง และเป็นเครื่องมือช่วยทำงาน ไม่ใช่ส่วนของเกม
 - **เทคนิคที่ใช้หาตำแหน่งจริง:** เขียน Python (PIL + numpy) คำนวณ offset "เท้าชุดตรงเท้าตัว" ทุกเฟรม แล้วเรนเดอร์ภาพรวม (contact sheet) ออกมาดูทีเดียวทุกท่า — เร็วกว่าลองผิดลองถูกทีละค่าในเกม
 
+### 3.11 UI Inventory (กด I เปิดกระเป๋า กดไอเทมเพื่อใส่)
+
+**การออกแบบ:** UI กับ Player ไม่รู้จักกันตรงๆ คุยกันผ่าน Resource กระเป๋าไฟล์เดียวกัน (แบบเดียวกับ HUD ↔ StatsData)
+```
+InventoryData (player_inventory.tres) ← รายการไอเทม + signal "ขอใส่ชิ้นนี้"
+   ↑ InventoryUI อ่านรายการ → สร้างปุ่ม → กดแล้วเรียก request_equip(item)
+   ↑ Player ฟัง equip_requested → equip(item) แยกตาม slot
+```
+ลบ UI ทิ้ง Player ยังทำงานได้ปกติ
+
+`data/inventory_data.gd`:
+```gdscript
+extends Resource
+class_name InventoryData
+
+signal equip_requested(item: EquipmentData)
+
+@export var items: Array[EquipmentData] = []
+
+func request_equip(item: EquipmentData) -> void:
+	equip_requested.emit(item)
+```
+
+Player: `@export var inventory: InventoryData` + ใน `_ready()` `inventory.equip_requested.connect(equip)` +
+```gdscript
+func equip(item: EquipmentData) -> void:
+	if item.slot == "weapon":
+		equip_weapon(item)
+	elif item.slot == "armor":
+		equip_armor(item)
+```
+
+`ui/inventory/inventory_ui.tscn`: `InventoryUI (CanvasLayer) > Panel (PanelContainer, %) > Grid (GridContainer, columns 4, %)`
+```gdscript
+extends CanvasLayer
+
+@export var inventory: InventoryData
+@onready var panel: PanelContainer = %Panel
+@onready var grid: GridContainer = %Grid
+
+func _ready() -> void:
+	panel.visible = false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("inventory"):
+		panel.visible = not panel.visible
+		if panel.visible:
+			_refresh()
+
+func _refresh() -> void:
+	for child in grid.get_children():
+		child.queue_free()
+	for item in inventory.items:
+		var button := Button.new()
+		button.text = item.item_name
+		button.icon = item.icon
+		button.pressed.connect(inventory.request_equip.bind(item))
+		grid.add_child(button)
+```
+- Instance เข้า `village.tscn` แล้วผูก Inventory เป็น `.tres` **ไฟล์เดียวกับที่ผูกใน Player**
+- Input Action `inventory` = ปุ่ม I
+- **concept ใหม่:** `%Name` (Unique Name — คลิกขวา node → Access as Unique Name) อ้างถึง node ได้แม้ย้ายตำแหน่งในโครง, `Button.new()` สร้างปุ่มด้วยโค้ดเมื่อจำนวนไม่คงที่, `Callable.bind(ค่า)` ผูกค่าติดไปกับฟังก์ชันล่วงหน้า
+- ตั้ง `starting_armor` ไว้ด้วยจะทดสอบไม่เห็นผล (ใส่อยู่แล้ว) — เคลียร์ออกก่อนทดสอบปุ่ม
+- ยังไม่ทำ: ถอดของ, ลากวางย้ายช่อง, จำกัดช่อง
+
+**ปัญหาที่เจอ + บทเรียน:**
+- **ปุ่มไม่มีรูป** = ไอเทมยังไม่ได้ตั้ง `icon` ในไฟล์ `.tres` (ไม่ใช่ปัญหาโค้ด)
+- **ลบ Sprite Frames ออกจาก node แล้วขึ้น error `set_animation: There is no animation with name 'attack'`** = node ยังจำค่า Animation เดิมไว้ในไฟล์ scene พอกด Revert ก็กลายเป็น `animation = &""` ยังขึ้น error อยู่ (Inspector เลือกชื่อท่าไม่ได้เมื่อไม่มี SpriteFrames) → **แก้ด้วยลบ node แล้วสร้างใหม่ชื่อเดิม** (node ใหม่ไม่มีค่าค้าง) หรือลบบรรทัด `animation = ...` ในไฟล์ `.tscn` ตรงๆ (ต้องปิดแท็บ scene ใน Godot ก่อน ไม่งั้นมันเซฟทับกลับ)
+- **error `Identifier "..." not declared` ค้างใน log** มักเป็นของตอนพิมพ์โค้ดไปได้ครึ่งเดียว เช็คโค้ดปัจจุบันก่อนตื่นตกใจ
+
+### 3.12 เปลี่ยนชื่อ/ย้ายไฟล์โดยไม่ทำให้ลิงก์พัง
+- **ย้ายผ่าน Godot** (ลากในแผง FileSystem / คลิกขวา Rename / MCP `filesystem_manage op=move`) ไม่ใช่ย้ายด้วย File Explorer หรือคำสั่ง shell — Godot อ้างอิงไฟล์ด้วย **uid** เลยยังหาเจอหลังย้าย
+- แต่ข้อความ `path="res://..."` ในไฟล์ `.tres` ที่อ้างถึงอาจยังเป็นชื่อเก่า (ทำงานได้เพราะใช้ uid แต่มี warning และอ่านแล้วงง) → **ค้นหาชื่อเก่าทั้งโปรเจกต์แล้วแก้ให้ตรง** จนค้นไม่เจอ แล้วสั่ง scan ใหม่
+- ปิดแท็บไฟล์ที่เกี่ยวข้องใน Godot ก่อนแก้ข้อความในไฟล์ ไม่งั้น Godot อาจเซฟ path เก่าทับกลับ
+- ห้ามลบไฟล์ `.uid` / `.import` ทิ้งเองตอนย้าย (ดู 5.10)
+
 ---
 
 ## 4. Input Actions ที่ใช้
@@ -291,6 +404,7 @@ func _sync_armor() -> void:
 | `ui_accept` | มีให้แล้ว (Space/Enter) | กระโดด |
 | `dash` | **ต้องสร้างเอง** ผ่าน Project Settings → Input Map | พุ่ง (ผูกปุ่ม Shift) |
 | `attack` | **ต้องสร้างเอง** ผ่าน Project Settings → Input Map | โจมตี (ผูกปุ่ม Z) |
+| `inventory` | **ต้องสร้างเอง** ผ่าน Project Settings → Input Map | เปิด/ปิดกระเป๋า (ผูกปุ่ม I) |
 
 ---
 
@@ -343,8 +457,10 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 - [x] Movement + collision (เดิน, กระโดด, พุ่ง, ชนกำแพง)
 - [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP เสร็จแล้ว (ยังไม่ live-update รอระบบต่อสู้)
 - [x] ระบบต่อสู้พื้นฐาน — โจมตี Dummy ด้วย Area2D hitbox, ลด HP, ตายแล้ว `queue_free()`, มี animation attack จริง
-- [x] ระบบ Equipment (ชุดเกราะ + อาวุธ) — `EquipmentData` resource, layered sprite ซ้อนชุดบน Body, อาวุธมีผลแค่สถิติ (ยังไม่มีภาพติดมือ, ยังไม่มี UI inventory ให้เลือกใส่เอง — ตอนนี้ equip ผ่าน `@export` ใน Inspector)
-- [ ] Inventory + Item pickup/ใช้ไอเทม
+- [x] ระบบ Equipment (ชุดเกราะ + อาวุธ) — `EquipmentData` resource, layered sprite หลายเลเยอร์ (ชุด + ดาบ) sync ด้วย signal, ชุดครบทุกท่า
+- [ ] ดาบติดมือ — ทำแล้วเฉพาะท่า `idle` (1 เฟรม) ท่าอื่นดาบจะซ่อน รอทำเฟรมเพิ่มใน Aseprite
+- [x] UI Inventory — กด I เปิด, กดไอเทมเพื่อใส่ (ยังไม่มีถอดของ)
+- [ ] Item pickup (เก็บของจากพื้น) / ไอเทมใช้แล้วหมด (ยา)
 - [ ] Skill system (cooldown, mana cost, effect)
 - [ ] Save/Load ตัวละคร (local ก่อน)
 - [ ] ค่อยไปแตะ network/multiplayer (Phase 3-4)

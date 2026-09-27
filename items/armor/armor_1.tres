@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("1_2ctjc")
-item_name = "Blood Crow Armor"
+item_name = "Armor_1"
 icon = ExtResource("1_cq2fu")
 slot = "armor"
 sprite_frames = ExtResource("2_jylhi")
