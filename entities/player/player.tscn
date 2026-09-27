@@ -132,12 +132,12 @@ starting_weapon = ExtResource("4_qpopc")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"walk"
+animation = &"idle"
 
 [node name="ArmorSprite" type="AnimatedSprite2D" parent="." unique_id=1773283763]
-position = Vector2(0, 11)
+position = Vector2(-1, 12)
 sprite_frames = ExtResource("24_t1t22")
-animation = &"attack"
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=782032351]
 shape = SubResource("RectangleShape2D_yqrof")

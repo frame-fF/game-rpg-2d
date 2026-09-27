@@ -71,7 +71,9 @@ func _physics_process(_delta: float) -> void:
 
 	animated_sprite.flip_h = facing_direction < 0
 	armor_sprite.flip_h = facing_direction < 0
+	armor_sprite.position.x = -1 * facing_direction
 	attack_area.position.x = 20 * facing_direction
+
 
 	if is_dashing:
 		animated_sprite.play("dash")
