@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dihj60io0an3n"]
+
+[ext_resource type="Script" uid="uid://dnxuwwdtjfjqb" path="res://ui/inventory/inventory_ui.gd" id="1_6ch5n"]
+
+[node name="InventoryUi" type="CanvasLayer" unique_id=1239711220]
+script = ExtResource("1_6ch5n")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=2114290128]
+unique_name_in_owner = true
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 60.0
+offset_bottom = 100.0
+
+[node name="Grid" type="GridContainer" parent="Panel" unique_id=2039453628]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 4

@@ -22,8 +22,10 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var equipped_weapon: EquipmentData
 var equipped_armor: EquipmentData
 var base_attack_power: int = 0
+@export var inventory: InventoryData
 
 func _ready() -> void:
+	inventory.equip_requested.connect(equip)
 	animated_sprite.frame_changed.connect(_sync_armor)
 	animated_sprite.animation_changed.connect(_sync_armor)
 	base_attack_power = stats.attack_power
@@ -93,6 +95,12 @@ func _attack() -> void:
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage"):
 			body.take_damage(stats.attack_power)
+
+func equip(item: EquipmentData) -> void:
+	if item.slot == "weapon":
+		equip_weapon(item)
+	elif item.slot == "armor":
+		equip_armor(item)
 
 func equip_weapon(item: EquipmentData) -> void:
 	equipped_weapon = item

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InventoryData" format=3 uid="uid://50dekp51o0oq"]
+
+[ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_v65aq"]
+[ext_resource type="Resource" uid="uid://c1j4kttfsbex1" path="res://items/armor/blood_crow_armor.tres" id="2_2qf1j"]
+[ext_resource type="Script" uid="uid://b604ka12h8hfy" path="res://data/inventory_data.gd" id="2_5l1br"]
+[ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/weapon_01.tres" id="3_p1vma"]
+
+[resource]
+script = ExtResource("2_5l1br")
+items = Array[ExtResource("1_v65aq")]([ExtResource("2_2qf1j"), ExtResource("3_p1vma")])
+metadata/_custom_type_script = "uid://b604ka12h8hfy"
