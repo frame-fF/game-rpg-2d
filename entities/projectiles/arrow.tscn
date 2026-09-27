@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cjw3fgibr0vad"]
+
+[ext_resource type="Script" uid="uid://ddgafa4i6ih7i" path="res://entities/projectiles/projectile.gd" id="1_d7ycy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
+size = Vector2(16, 4)
+
+[node name="Arrow" type="Area2D" unique_id=1682612089]
+script = ExtResource("1_d7ycy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1860451292]
+shape = SubResource("RectangleShape2D_5efxa")

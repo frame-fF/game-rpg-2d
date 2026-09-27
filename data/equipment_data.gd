@@ -8,3 +8,5 @@ class_name EquipmentData
 @export var attack_bonus: int = 0
 @export var sprite_frames: SpriteFrames
 @export var attack_range: float = 0.0
+@export_enum("melee", "projectile") var attack_type: String = "melee"
+@export var projectile_scene: PackedScene

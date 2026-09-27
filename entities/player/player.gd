@@ -97,9 +97,14 @@ func _physics_process(_delta: float) -> void:
 
 func _attack() -> void:
 	var damage := stats.attack_power + inventory.get_attack_bonus()
+	var weapon: EquipmentData = inventory.equipped.get("weapon")
+	if weapon and weapon.attack_type == "projectile":
+		_shoot(weapon.projectile_scene, damage)
+		return
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage"):
 			body.take_damage(damage)
+
 
 
 func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
@@ -131,3 +136,11 @@ func _sync_layer(layer: AnimatedSprite2D) -> void:
 func _set_attack_range(value: float) -> void:
 	attack_range = value
 	attack_shape.shape.size.x = value
+
+func _shoot(scene: PackedScene, damage: int) -> void:
+	var projectile := scene.instantiate() as Projectile
+	projectile.direction = facing_direction
+	projectile.damage = damage
+	projectile.shooter = self
+	projectile.position = position + Vector2(ATTACK_START * facing_direction, -10)
+	get_parent().add_child(projectile)
