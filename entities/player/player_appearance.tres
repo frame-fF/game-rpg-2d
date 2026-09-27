@@ -1,7 +1,9 @@
 [gd_resource type="Resource" script_class="AppearanceData" format=3 uid="uid://c3ni3jtbrusd3"]
 
 [ext_resource type="Script" uid="uid://dvnx0kyvdvowi" path="res://data/appearance_data.gd" id="1_k6g3i"]
+[ext_resource type="Resource" uid="uid://7vls073pxhhw" path="res://items/face/face_1.tres" id="1_yxkvd"]
 
 [resource]
 script = ExtResource("1_k6g3i")
+face = ExtResource("1_yxkvd")
 metadata/_custom_type_script = "uid://dvnx0kyvdvowi"

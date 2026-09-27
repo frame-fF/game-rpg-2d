@@ -106,7 +106,7 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	_sync_layers()
 
 func _apply_appearance() -> void:
-	face_sprite.sprite_frames = appearance.face
+	face_sprite.sprite_frames = appearance.face.sprite_frames if appearance.face else null
 	_sync_layers()
 
 func _sync_layers() -> void:
