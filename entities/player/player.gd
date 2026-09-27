@@ -6,6 +6,10 @@ extends CharacterBody2D
 @export var dash_duration: float = 0.2
 @export var dash_cooldown: float = 0.6
 @export var attack_duration: float = 0.3
+@onready var attack_shape: CollisionShape2D = $AttackArea/CollisionShape2D
+@export var unarmed_range: float = 24.0
+const ATTACK_START := 8.0
+var attack_range: float = 0.0
 var facing_direction: float = 1.0
 var is_dashing: bool = false
 var dash_timer: float = 0.0
@@ -29,6 +33,8 @@ func _ready() -> void:
 	animated_sprite.animation_changed.connect(_sync_layers)
 	appearance.changed.connect(_apply_appearance)
 	_apply_appearance()
+	attack_shape.shape = attack_shape.shape.duplicate()
+	_set_attack_range(unarmed_range)
 
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
@@ -73,7 +79,7 @@ func _physics_process(_delta: float) -> void:
 	armor_sprite.flip_h = facing_direction < 0
 	weapon_sprite.flip_h = facing_direction < 0
 	face_sprite.flip_h = facing_direction < 0
-	attack_area.position.x = 20 * facing_direction
+	attack_area.position.x = (ATTACK_START + attack_range / 2) * facing_direction
 
 
 
@@ -100,6 +106,7 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	var frames: SpriteFrames = item.sprite_frames if item else null
 	if slot == "weapon":
 		weapon_sprite.sprite_frames = frames
+		_set_attack_range(item.attack_range if item and item.attack_range > 0 else unarmed_range)
 	elif slot == "armor":
 		armor_sprite.sprite_frames = frames
 	_sync_layers()
@@ -120,3 +127,7 @@ func _sync_layer(layer: AnimatedSprite2D) -> void:
 		layer.frame = animated_sprite.frame
 	else:
 		layer.visible = false
+
+func _set_attack_range(value: float) -> void:
+	attack_range = value
+	attack_shape.shape.size.x = value

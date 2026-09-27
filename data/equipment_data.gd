@@ -7,3 +7,4 @@ class_name EquipmentData
 @export_enum("weapon", "armor", "face") var slot: String = "weapon"
 @export var attack_bonus: int = 0
 @export var sprite_frames: SpriteFrames
+@export var attack_range: float = 0.0
