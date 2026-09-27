@@ -2,6 +2,9 @@ extends StaticBody2D
 
 @export var stats: StatsData
 
+func _ready() -> void:
+	stats = stats.duplicate()
+	
 func take_damage(amount: int) -> void:
 	stats.hp -= amount
 	print("Dummy took ", amount, " damage. HP: ", stats.hp, "/", stats.max_hp)

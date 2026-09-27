@@ -4,11 +4,18 @@
 [ext_resource type="PackedScene" uid="uid://7gnyoedehl3j" path="res://ui/hud/hud.tscn" id="2_nb4jv"]
 [ext_resource type="Resource" uid="uid://d4fbfjbrm5dsm" path="res://entities/player/player_stats.tres" id="3_d67yf"]
 [ext_resource type="PackedScene" uid="uid://03g1ctukxysw" path="res://entities/dummy/dummy.tscn" id="4_hhw0u"]
+[ext_resource type="Script" uid="uid://qhr1nukycj2" path="res://data/stats_data.gd" id="5_3w0es"]
 [ext_resource type="PackedScene" uid="uid://dihj60io0an3n" path="res://ui/inventory/inventory_ui.tscn" id="5_4ohoq"]
 [ext_resource type="Resource" uid="uid://50dekp51o0oq" path="res://entities/player/player_inventory.tres" id="6_3w0es"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
 size = Vector2(2000, 20)
+
+[sub_resource type="Resource" id="Resource_3w0es"]
+script = ExtResource("5_3w0es")
+max_hp = 200
+hp = 200
+metadata/_custom_type_script = "uid://qhr1nukycj2"
 
 [node name="Village" type="Node2D" unique_id=1008683300]
 
@@ -25,6 +32,13 @@ stats = ExtResource("3_d67yf")
 
 [node name="Dummy" parent="." unique_id=406471295 instance=ExtResource("4_hhw0u")]
 position = Vector2(150, -20)
+stats = SubResource("Resource_3w0es")
+
+[node name="Dummy2" parent="." unique_id=1988899067 instance=ExtResource("4_hhw0u")]
+position = Vector2(281, -20)
+
+[node name="Dummy3" parent="." unique_id=1239494168 instance=ExtResource("4_hhw0u")]
+position = Vector2(419, -19)
 
 [node name="InventoryUi" parent="." unique_id=1239711220 instance=ExtResource("5_4ohoq")]
 inventory = ExtResource("6_3w0es")
