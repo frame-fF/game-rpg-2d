@@ -190,6 +190,46 @@ func _ready() -> void:
 
 **Animation "attack" ผูกเข้ากับ state:** ใช้ pattern เดียวกับ `is_dashing`/`dash_timer` เป๊ะๆ — เพิ่ม `is_attacking`/`attack_timer`/`attack_duration` แล้วจัดลำดับ priority animation ใหม่: `is_dashing > is_attacking > not is_on_floor() (jump) > direction != 0 (walk) > idle`. เลือกเฟรมท่าโจมตีจาก asset โดยดูรูปย่อ (thumbnail) จริงในหน้าต่างเลือกไฟล์ (สลับจาก List view เป็น Grid/Thumbnail view ที่มุมบนขวาของ FileDialog) แทนการเดาจากชื่อไฟล์ตัวเลข
 
+### 3.9 ระบบ Equipment (ชุดเกราะ + อาวุธ)
+
+**สถาปัตยกรรมข้อมูล:** `data/equipment_data.gd` (`class_name EquipmentData extends Resource`)
+```gdscript
+extends Resource
+class_name EquipmentData
+
+@export var id: int
+@export var item_name: String
+@export var icon: Texture2D
+@export var slot: String # "weapon" หรือ "armor"
+@export var attack_bonus: int = 0
+@export var sprite_frames: SpriteFrames # เฉพาะ armor ใช้
+```
+ไฟล์ `.tres` จริง (ตัวข้อมูล ไม่ใช่แม่แบบ) เก็บที่ **`items/`** แยกจาก `data/` (แม่แบบสคริปต์) — `items/armor/`, `items/weapons/` — คนละที่กับไฟล์รูปดิบที่อยู่ `entities/player/armor/`, `entities/player/weapons/` (จัดกลุ่มไฟล์รูปตาม feature/ตัวละคร, จัดกลุ่ม `.tres` ตามหน้าที่ "เป็นไอเทม")
+
+**Layered Sprite (ซ้อนภาพชุดเกราะบน Body):**
+```
+Player (CharacterBody2D)
+├── AnimatedSprite2D   ← Body
+├── ArmorSprite         ← ใหม่ อยู่ใต้ Body ในลิสต์ (Godot วาด sibling หลังทับ sibling ก่อน)
+├── CollisionShape2D
+├── Camera2D
+└── AttackArea
+```
+- ทั้งสอง sprite อยู่ตำแหน่ง `(0, ~11)` ใกล้เคียงกัน ใช้ **Centered = true** (ค่า default ของ Godot) ซึ่งจัดกึ่งกลางแต่ละเฟรมอัตโนมัติตามขนาดภาพของเฟรมนั้นๆ เอง
+- SpriteFrames ของ ArmorSprite ต้องมี **animation ชื่อตรงกับ Body ทุกตัว** (`idle/walk/dash/jump/attack`) ใช้เลขเฟรมเดียวกันจากคนละโฟลเดอร์ (Body กับ Armor asset)
+- ทุกเฟรมของ `_physics_process` ต้องสั่ง `armor_sprite.play(animated_sprite.animation)` และ sync `flip_h`/`position.x` (คูณด้วย `facing_direction`) ให้ตรงกับ Body ตลอดเวลา ไม่ใช่แค่ตอน equip ครั้งแรก
+- `equip_weapon()` คำนวณ `stats.attack_power = base_attack_power + item.attack_bonus` (เก็บ `base_attack_power` แยกไว้ป้องกันบวกทบตอน equip ซ้ำ)
+- อาวุธที่มีแค่ **ไอคอนแบน** (ไม่ใช่ชุดเฟรม 58 ภาพเหมือนชุดเกราะ) จะมีผลแค่ "สถิติ" เท่านั้น ไม่มีภาพติดมือให้เห็นในเกม — ต้องมี asset เป็นชุดเฟรมสอดคล้องท่าทางเหมือนชุดเกราะถึงจะทำภาพติดมือได้
+
+**ปัญหาที่เจอ + บทเรียน:**
+- **แก้ property ตอนเกมกำลังรันอยู่ (Play mode) ไม่ติดถาวร** — ค่าที่แก้ระหว่างรันเป็นแค่ preview ชั่วคราว ต้อง **หยุดเกม (F8) ก่อนแก้ แล้วเซฟ** ถึงจะติดถาวร (พฤติกรรมปกติของ Godot ไม่ใช่บั๊ก)
+- **ตำแหน่งซ้อนภาพ 2 เลเยอร์ไม่ตรงกัน เพราะ asset ถูกตัดขอบ (trim) ไม่เท่ากันทุกเฟรม** — แม้แต่ชุดเดียวกัน เฟรม idle ติดกัน (0,1,2) ก็มีขนาด canvas สูงไม่เท่ากัน (77/78/79 พิกเซล) การใช้ Centered ช่วยได้ระดับหนึ่งแต่ไม่การันตีสมบูรณ์แบบทุกเฟรม โดยเฉพาะท่าที่ไม่สมมาตร (attack/dash ที่ยื่นแขน/ขา)
+- **แกน Y ต้องขยับ (ลงมาประมาณ 10-11px) เพราะขนาดชุดกับ Body ไม่เท่ากัน แต่แกน X ควรเป็น 0 ตามหลักการ** (ท่ายืน/เดินสมมาตรซ้าย-ขวา) — ถ้าเห็นขอบโผล่ที่ x=0 มักเป็นแค่บางเฟรมที่ท่าไม่สมมาตร ไม่ใช่ค่า offset ผิด
+- **ต้องคูณ offset ด้วย `facing_direction`** เพื่อให้ตำแหน่งสลับข้างถูกต้องตอนพลิกซ้าย-ขวา (`flip_h` กลับแค่ภาพ ไม่กลับตำแหน่ง) — ใช้ pattern เดียวกับ `attack_area.position.x`
+- **สีผิวโผล่เล็กๆ ตรงข้อต่อ (เช่นหัวเข่า) แม้เช็คแล้วเฟรมต้นฉบับเต็มทุกภาพ** — น่าจะเป็นรอยต่อ (seam) บางๆ ในตัวอาร์ตของชุดเกราะเอง (จุดที่ออกแบบให้ข้อเข่างอได้) ที่ไม่ทึบสนิท 100% พอซ้อนกับ Body ที่มีสีผิวอยู่ตรงนั้นพอดีเลยโผล่ให้เห็น — เป็นข้อจำกัดของการเอา asset 2 ชุดที่ไม่ได้ออกแบบมาคู่กันมาประกบ ไม่ใช่บั๊กจากตำแหน่ง/โค้ด ยอมรับเป็น placeholder imperfection ไปก่อนได้
+- **debug flag อย่าง "Visible Collision Shapes" มีผลแค่ตอนเริ่มเกมใหม่** เปลี่ยนตอนเกมรันอยู่แล้วจะไม่มีผลจนกว่าจะ stop + run ใหม่
+- **วิธี debug ที่ได้ผลดีที่สุดตอนเถียงกันว่า "เห็น/ไม่เห็น" อะไร:** ถ่าย screenshot จริงจากเกม (`editor_screenshot` source="game") แล้ว crop+ขยายด้วย Python (PIL) ดูพิกเซลจริงชัดๆ แทนการเดาจากคำบรรยาย
+
 ---
 
 ## 4. Input Actions ที่ใช้
@@ -251,7 +291,8 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 
 - [x] Movement + collision (เดิน, กระโดด, พุ่ง, ชนกำแพง)
 - [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP เสร็จแล้ว (ยังไม่ live-update รอระบบต่อสู้)
-- [x] ระบบต่อสู้พื้นฐาน — โจมตี Dummy ด้วย Area2D hitbox, ลด HP, ตายแล้ว `queue_free()` (ยังไม่มี damage formula ซับซ้อน แค่ค่าคงที่ `attack_power`, ยังไม่มี animation โจมตี)
+- [x] ระบบต่อสู้พื้นฐาน — โจมตี Dummy ด้วย Area2D hitbox, ลด HP, ตายแล้ว `queue_free()`, มี animation attack จริง
+- [x] ระบบ Equipment (ชุดเกราะ + อาวุธ) — `EquipmentData` resource, layered sprite ซ้อนชุดบน Body, อาวุธมีผลแค่สถิติ (ยังไม่มีภาพติดมือ, ยังไม่มี UI inventory ให้เลือกใส่เอง — ตอนนี้ equip ผ่าน `@export` ใน Inspector)
 - [ ] Inventory + Item pickup/ใช้ไอเทม
 - [ ] Skill system (cooldown, mana cost, effect)
 - [ ] Save/Load ตัวละคร (local ก่อน)
