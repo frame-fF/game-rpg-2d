@@ -18,22 +18,15 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var attack_area: Area2D = $AttackArea
 @onready var armor_sprite: AnimatedSprite2D = $ArmorSprite
 @onready var weapon_sprite: AnimatedSprite2D = $WeaponSprite
-@export var starting_armor: EquipmentData
-@export var starting_weapon: EquipmentData
-var equipped_weapon: EquipmentData
-var equipped_armor: EquipmentData
+
 var base_attack_power: int = 0
 @export var inventory: InventoryData
 
 func _ready() -> void:
-	inventory.equip_requested.connect(equip)
+	inventory.equipment_changed.connect(_on_equipment_changed)
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
 	base_attack_power = stats.attack_power
-	if starting_armor:
-		equip_armor(starting_armor)
-	if starting_weapon:
-		equip_weapon(starting_weapon)
 
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
@@ -98,21 +91,13 @@ func _attack() -> void:
 		if body.has_method("take_damage"):
 			body.take_damage(stats.attack_power)
 
-func equip(item: EquipmentData) -> void:
-	if item.slot == "weapon":
-		equip_weapon(item)
-	elif item.slot == "armor":
-		equip_armor(item)
-
-func equip_weapon(item: EquipmentData) -> void:
-	equipped_weapon = item
-	stats.attack_power = base_attack_power + item.attack_bonus
-	weapon_sprite.sprite_frames = item.sprite_frames
-	_sync_layers()
-
-func equip_armor(item: EquipmentData) -> void:
-	equipped_armor = item
-	armor_sprite.sprite_frames = item.sprite_frames
+func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
+	var frames: SpriteFrames = item.sprite_frames if item else null
+	if slot == "weapon":
+		stats.attack_power = base_attack_power + (item.attack_bonus if item else 0)
+		weapon_sprite.sprite_frames = frames
+	elif slot == "armor":
+		armor_sprite.sprite_frames = frames
 	_sync_layers()
 
 func _sync_layers() -> void:

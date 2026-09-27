@@ -6,12 +6,17 @@ extends CanvasLayer
 
 func _ready() -> void:
 	panel.visible = false
+	inventory.equipment_changed.connect(_on_equipment_changed)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("inventory"):
 		panel.visible = not panel.visible
 		if panel.visible:
 			_refresh()
+
+func _on_equipment_changed(_slot: String, _item: EquipmentData) -> void:
+	if panel.visible:
+		_refresh()
 
 func _refresh() -> void:
 	for child in grid.get_children():
@@ -20,5 +25,7 @@ func _refresh() -> void:
 		var button := Button.new()
 		button.text = item.item_name
 		button.icon = item.icon
-		button.pressed.connect(inventory.request_equip.bind(item))
+		button.toggle_mode = true
+		button.button_pressed = inventory.is_equipped(item)
+		button.pressed.connect(inventory.toggle_equip.bind(item))
 		grid.add_child(button)
