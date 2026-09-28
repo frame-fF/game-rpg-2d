@@ -12,3 +12,4 @@ class_name StatsData
 @export var mp: int = 50
 
 @export var attack_power: int = 10
+@export var attack_speed: float = 1.0

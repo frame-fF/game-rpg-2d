@@ -26,12 +26,6 @@ shape = SubResource("RectangleShape2D_5efxa")
 
 [node name="Player" parent="." unique_id=478418677 instance=ExtResource("1_jkcsq")]
 position = Vector2(0, -100)
-speed = null
-jump_velocity = null
-dash_speed = null
-dash_duration = null
-dash_cooldown = null
-attack_duration = null
 
 [node name="Hud" parent="." unique_id=1784162250 instance=ExtResource("2_nb4jv")]
 stats = ExtResource("3_d67yf")

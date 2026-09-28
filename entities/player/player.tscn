@@ -39,7 +39,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("8_qpopc")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"attack",
 "speed": 5.0
 }, {
@@ -123,7 +123,7 @@ inventory = ExtResource("5_50fht")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = SubResource("SpriteFrames_v0b18")
-animation = &"attack"
+animation = &"dash"
 
 [node name="FaceSprite" type="AnimatedSprite2D" parent="." unique_id=1905384956]
 

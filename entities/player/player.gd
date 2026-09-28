@@ -5,7 +5,6 @@ extends CharacterBody2D
 @export var dash_speed: float = 600.0
 @export var dash_duration: float = 0.2
 @export var dash_cooldown: float = 0.6
-@export var attack_duration: float = 0.3
 @onready var attack_shape: CollisionShape2D = $AttackArea/CollisionShape2D
 @export var unarmed_range: float = 24.0
 const ATTACK_START := 8.0
@@ -15,7 +14,6 @@ var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var is_attacking: bool = false
-var attack_timer: float = 0.0
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @export var stats: StatsData
@@ -35,6 +33,7 @@ func _ready() -> void:
 	_apply_appearance()
 	attack_shape.shape = attack_shape.shape.duplicate()
 	_set_attack_range(unarmed_range)
+	animated_sprite.animation_finished.connect(_on_animation_finished)
 
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
@@ -55,14 +54,8 @@ func _physics_process(_delta: float) -> void:
 		dash_timer = dash_duration
 		dash_cooldown_timer = dash_cooldown
 
-	if attack_timer > 0.0:
-		attack_timer -= _delta
-		if attack_timer <= 0.0:
-			is_attacking = false
-
 	if Input.is_action_just_pressed("attack") and not is_attacking:
 		is_attacking = true
-		attack_timer = attack_duration
 		_attack()
 
 	if is_dashing:
@@ -86,7 +79,7 @@ func _physics_process(_delta: float) -> void:
 	if is_dashing:
 		animated_sprite.play("dash")
 	elif is_attacking:
-		animated_sprite.play("attack")
+		animated_sprite.play("attack", stats.attack_speed * inventory.get_attack_speed())
 	elif not is_on_floor():
 		animated_sprite.play("jump")
 	elif direction != 0:
@@ -144,3 +137,7 @@ func _shoot(scene: PackedScene, damage: int) -> void:
 	projectile.shooter = self
 	projectile.position = position + Vector2(ATTACK_START * facing_direction, -10)
 	get_parent().add_child(projectile)
+
+func _on_animation_finished() -> void:
+	if animated_sprite.animation == "attack":
+		is_attacking = false
