@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://c6eoqhif6ts16"]
 
 [ext_resource type="Texture2D" uid="uid://c783k5oy0emcd" path="res://entities/player/sprites/armor/1/f/attack_0.png" id="1_0s5dk"]
 [ext_resource type="Texture2D" uid="uid://dqjk6m6iisymo" path="res://entities/player/sprites/armor/1/f/attack_1.png" id="2_fltgj"]
@@ -15,7 +15,9 @@
 [ext_resource type="Texture2D" uid="uid://cdsu6thosyauh" path="res://entities/player/sprites/armor/1/f/jump_2.png" id="10_wp5po"]
 [ext_resource type="Texture2D" uid="uid://bb8cp6sbaycb5" path="res://entities/player/sprites/armor/1/f/walk_0.png" id="12_b3spn"]
 [ext_resource type="Texture2D" uid="uid://61vq4dgjakdh" path="res://entities/player/sprites/armor/1/f/walk_1.png" id="13_mhc7e"]
+[ext_resource type="Texture2D" uid="uid://dcvphds36l7d" path="res://entities/player/sprites/armor/1/f/shoot_0.png" id="14_d5ken"]
 [ext_resource type="Texture2D" uid="uid://dvwp5f3os6ktk" path="res://entities/player/sprites/armor/1/f/walk_2.png" id="14_d7yi7"]
+[ext_resource type="Texture2D" uid="uid://b108biufrk3y4" path="res://entities/player/sprites/armor/1/f/shoot_1.png" id="15_jqcpv"]
 [ext_resource type="Texture2D" uid="uid://ua5p648astes" path="res://entities/player/sprites/armor/1/f/walk_3.png" id="15_jvaqa"]
 [ext_resource type="Texture2D" uid="uid://bif7yf5w66g0g" path="res://entities/player/sprites/armor/1/f/walk_4.png" id="16_wp5po"]
 [ext_resource type="Texture2D" uid="uid://djy443vkwi50m" path="res://entities/player/sprites/armor/1/f/walk_5.png" id="17_0s5dk"]
@@ -79,6 +81,17 @@ animations = [{
 }],
 "loop": 1,
 "name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_d5ken")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_jqcpv")
+}],
+"loop": 1,
+"name": &"shoot",
 "speed": 5.0
 }, {
 "frames": [{
