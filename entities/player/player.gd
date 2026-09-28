@@ -91,7 +91,7 @@ func _physics_process(_delta: float) -> void:
 
 func _attack() -> void:
 	var damage := stats.attack_power + inventory.get_attack_bonus()
-	var weapon: EquipmentData = inventory.equipped.get("weapon")
+	var weapon := inventory.equipped.get("weapon") as WeaponData
 	if weapon and weapon.attack_type == "projectile":
 		_shoot(weapon.projectile_scene, damage)
 		return
@@ -105,7 +105,9 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	var frames: SpriteFrames = item.sprite_frames if item else null
 	if slot == "weapon":
 		weapon_sprite.sprite_frames = frames
-		_set_attack_range(item.attack_range if item and item.attack_range > 0 else unarmed_range)
+		var weapon := item as WeaponData
+		_set_attack_range(weapon.attack_range if weapon and weapon.attack_range > 0 else unarmed_range)
+
 	elif slot == "armor":
 		armor_sprite.sprite_frames = frames
 	_sync_layers()

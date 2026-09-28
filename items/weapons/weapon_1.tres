@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentData" format=3 uid="uid://i04xigg1lngp"]
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://i04xigg1lngp"]
 
-[ext_resource type="Script" uid="uid://dsnryq0h70574" path="res://data/equipment_data.gd" id="1_bgha5"]
-[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/1/icon.png" id="1_ykiql"]
-[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/weapon_1_frames.tres" id="3_77v1d"]
+[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/1/icon.png" id="1_u238w"]
+[ext_resource type="Script" uid="uid://dm3hge5vpfky3" path="res://data/weapon_data.gd" id="1_yp014"]
+[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/weapon_1_frames.tres" id="3_pavsn"]
 
 [resource]
-script = ExtResource("1_bgha5")
-item_name = "Weapon_1"
-icon = ExtResource("1_ykiql")
-attack_bonus = 5
-sprite_frames = ExtResource("3_77v1d")
+script = ExtResource("1_yp014")
 attack_range = 40.0
-attack_speed = 2.5
+item_name = "weapon_1"
+icon = ExtResource("1_u238w")
+sprite_frames = ExtResource("3_pavsn")
+attack_bonus = 5
+attack_speed_multiplier = 4.0
 metadata/_custom_type_script = "uid://dsnryq0h70574"

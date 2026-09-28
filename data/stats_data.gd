@@ -8,6 +8,9 @@ class_name StatsData
 @export var max_hp: int = 100
 @export var hp: int = 100
 
+@export var defense: int = 5
+@export var resistance: int = 0
+
 @export var max_mp: int = 50
 @export var mp: int = 50
 
