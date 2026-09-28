@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqtu87psm3hf0"
-path="res://.godot/imported/jump_0.png-410bf97eb9601e4683b94bf56ef2f52a.ctex"
+uid="uid://88n6hjf03dj7"
+path="res://.godot/imported/walk_0.png-aa7419910f180a30dc317eb86eb4e716.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/jump_0.png"
-dest_files=["res://.godot/imported/jump_0.png-410bf97eb9601e4683b94bf56ef2f52a.ctex"]
+source_file="res://entities/player/sprites/armor/1/m/walk_0.png"
+dest_files=["res://.godot/imported/walk_0.png-aa7419910f180a30dc317eb86eb4e716.ctex"]
 
 [params]
 

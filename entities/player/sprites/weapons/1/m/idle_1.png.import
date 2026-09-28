@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bikkroc3vqoty"
-path="res://.godot/imported/attack_3.png-39b313c75e76c7f8bb21b27418bd0bde.ctex"
+uid="uid://c2p1l3id50y7f"
+path="res://.godot/imported/idle_1.png-493a50baf364cfc8cda2371cc03c830d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/attack_3.png"
-dest_files=["res://.godot/imported/attack_3.png-39b313c75e76c7f8bb21b27418bd0bde.ctex"]
+source_file="res://entities/player/sprites/weapons/1/m/idle_1.png"
+dest_files=["res://.godot/imported/idle_1.png-493a50baf364cfc8cda2371cc03c830d.ctex"]
 
 [params]
 

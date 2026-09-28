@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://88n6hjf03dj7"
-path="res://.godot/imported/walk_0.png-3080142856ac0209e58a10b31fa73ebf.ctex"
+uid="uid://dffbmuelhn2ia"
+path="res://.godot/imported/idle_1.png-9d517cbcfd84a46bfc37576ad9f26549.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/walk_0.png"
-dest_files=["res://.godot/imported/walk_0.png-3080142856ac0209e58a10b31fa73ebf.ctex"]
+source_file="res://entities/player/sprites/face/1/m/idle_1.png"
+dest_files=["res://.godot/imported/idle_1.png-9d517cbcfd84a46bfc37576ad9f26549.ctex"]
 
 [params]
 

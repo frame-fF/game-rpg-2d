@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cvhydcghi54yl"
-path="res://.godot/imported/idle_0.png-812976920e03650b8fd32654ef48f76b.ctex"
+uid="uid://bv14oylv1362d"
+path="res://.godot/imported/jump_2.png-d6e080373498dce596683b96ed8d2877.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/face/1/idle_0.png"
-dest_files=["res://.godot/imported/idle_0.png-812976920e03650b8fd32654ef48f76b.ctex"]
+source_file="res://entities/player/sprites/armor/1/m/jump_2.png"
+dest_files=["res://.godot/imported/jump_2.png-d6e080373498dce596683b96ed8d2877.ctex"]
 
 [params]
 

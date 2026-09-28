@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bv14oylv1362d"
-path="res://.godot/imported/jump_2.png-16f8996800ccf8a22be843818c8ff639.ctex"
+uid="uid://cqtu87psm3hf0"
+path="res://.godot/imported/jump_0.png-afce6f24ff14653f4856fe43bbe7936f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/jump_2.png"
-dest_files=["res://.godot/imported/jump_2.png-16f8996800ccf8a22be843818c8ff639.ctex"]
+source_file="res://entities/player/sprites/armor/1/m/jump_0.png"
+dest_files=["res://.godot/imported/jump_0.png-afce6f24ff14653f4856fe43bbe7936f.ctex"]
 
 [params]
 

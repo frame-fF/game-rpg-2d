@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ocikcqkklwqh"
-path="res://.godot/imported/attack_0.png-6ac155ea56a4799e2ea0368192c38f0b.ctex"
+uid="uid://b3q2fnbq2cybu"
+path="res://.godot/imported/walk_2.png-24a73fa5bc6ae08f7ed8e9d1d42dee65.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/attack_0.png"
-dest_files=["res://.godot/imported/attack_0.png-6ac155ea56a4799e2ea0368192c38f0b.ctex"]
+source_file="res://entities/player/sprites/armor/1/m/walk_2.png"
+dest_files=["res://.godot/imported/walk_2.png-24a73fa5bc6ae08f7ed8e9d1d42dee65.ctex"]
 
 [params]
 

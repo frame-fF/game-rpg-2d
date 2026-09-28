@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://pwbr2dkes7en"
-path="res://.godot/imported/dash_2.png-8a648190419cc42aaac5b15faa23919f.ctex"
+uid="uid://dmfry0qocjdpo"
+path="res://.godot/imported/walk_4.png-840868b6741dfa4427a1acc6ad7f28ad.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/1/dash_2.png"
-dest_files=["res://.godot/imported/dash_2.png-8a648190419cc42aaac5b15faa23919f.ctex"]
+source_file="res://entities/player/sprites/armor/1/m/walk_4.png"
+dest_files=["res://.godot/imported/walk_4.png-840868b6741dfa4427a1acc6ad7f28ad.ctex"]
 
 [params]
 
