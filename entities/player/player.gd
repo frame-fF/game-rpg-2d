@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var speed: float = 200.0
+const WALK_ANIM_SPEED := 200.0
 @export var jump_velocity: float = -400.0
 @export var dash_speed: float = 600.0
 @export var dash_duration: float = 0.2
@@ -44,7 +44,8 @@ func _physics_process(_delta: float) -> void:
 
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
-
+		
+	var move_speed := stats.move_speed * inventory.get_move_speed()
 	var direction: float = Input.get_axis("move_left", "move_right")
 	if direction != 0:
 		facing_direction = sign(direction)
@@ -64,7 +65,7 @@ func _physics_process(_delta: float) -> void:
 		if dash_timer <= 0.0:
 			is_dashing = false
 	else:
-		velocity.x = direction * speed
+		velocity.x = direction * move_speed
 
 	move_and_slide()
 
@@ -83,7 +84,7 @@ func _physics_process(_delta: float) -> void:
 	elif not is_on_floor():
 		animated_sprite.play("jump")
 	elif direction != 0:
-		animated_sprite.play("walk")
+		animated_sprite.play("walk", move_speed / WALK_ANIM_SPEED)
 	else:
 		animated_sprite.play("idle")
 

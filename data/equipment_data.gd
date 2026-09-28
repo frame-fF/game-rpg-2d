@@ -11,3 +11,4 @@ class_name EquipmentData
 @export_enum("melee", "projectile") var attack_type: String = "melee"
 @export var projectile_scene: PackedScene
 @export var attack_speed: float = 1.0
+@export var move_speed: float = 1.0

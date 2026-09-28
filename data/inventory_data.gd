@@ -28,3 +28,9 @@ func get_attack_speed() -> float:
 	for item in equipped.values():
 		total *= item.attack_speed
 	return total
+
+func get_move_speed() -> float:
+	var total := 1.0
+	for item in equipped.values():
+		total *= item.move_speed
+	return total
