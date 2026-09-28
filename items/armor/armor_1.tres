@@ -6,7 +6,6 @@
 
 [resource]
 script = ExtResource("2_h6wsu")
-hp = 100
 item_name = "armor_1"
 icon = ExtResource("1_cq2fu")
 slot = "armor"

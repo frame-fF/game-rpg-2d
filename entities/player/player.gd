@@ -90,7 +90,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func _attack() -> void:
-	var damage := stats.attack_power + inventory.get_attack_bonus()
+	var damage := stats.attack_power + inventory.get_attack_power_bonus()
 	var weapon := inventory.equipped.get("weapon") as WeaponData
 	if weapon and weapon.attack_type == "projectile":
 		_shoot(weapon.projectile_scene, damage)

@@ -10,6 +10,6 @@ attack_range = 40.0
 item_name = "weapon_1"
 icon = ExtResource("1_u238w")
 sprite_frames = ExtResource("3_pavsn")
-attack_bonus = 5
+attack_power_bonus = 5
 attack_speed_multiplier = 4.0
 metadata/_custom_type_script = "uid://dsnryq0h70574"

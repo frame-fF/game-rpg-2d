@@ -17,10 +17,10 @@ func toggle_equip(item: EquipmentData) -> void:
 func is_equipped(item: EquipmentData) -> bool:
 	return equipped.get(item.slot) == item
 
-func get_attack_bonus() -> int:
+func get_attack_power_bonus() -> int:
 	var total := 0
 	for item in equipped.values():
-		total += item.attack_bonus
+		total += item.attack_power_bonus
 	return total
 	
 func get_attack_speed() -> float:
