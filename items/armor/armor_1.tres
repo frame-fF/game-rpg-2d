@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://y0uk0hxftxid" path="res://entities/player/sprites/armor/1/icon.png" id="1_cq2fu"]
 [ext_resource type="Script" uid="uid://dpwh2u28wj1s8" path="res://data/armor_data.gd" id="2_h6wsu"]
-[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/armor_1_frames.tres" id="2_jylhi"]
+[ext_resource type="SpriteFrames" uid="uid://bbb6yjl8maqgo" path="res://items/armor/armor_1_frames_m.tres" id="2_jylhi"]
 
 [resource]
 script = ExtResource("2_h6wsu")
