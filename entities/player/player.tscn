@@ -4,8 +4,8 @@
 [ext_resource type="Resource" uid="uid://d4fbfjbrm5dsm" path="res://entities/player/player_stats.tres" id="2_3wlsy"]
 [ext_resource type="Resource" uid="uid://c3ni3jtbrusd3" path="res://entities/player/player_appearance.tres" id="3_ghoj8"]
 [ext_resource type="Resource" uid="uid://50dekp51o0oq" path="res://entities/player/player_inventory.tres" id="5_50fht"]
-[ext_resource type="SpriteFrames" path="res://entities/player/body_frames_m.tres" id="6_body"]
-[ext_resource type="SpriteFrames" path="res://entities/player/body_frames_f.tres" id="7_body_f"]
+[ext_resource type="SpriteFrames" uid="uid://dmvc4flteab5r" path="res://entities/player/body_frames_m.tres" id="6_body"]
+[ext_resource type="SpriteFrames" uid="uid://02smevmufg0g" path="res://entities/player/body_frames_f.tres" id="7_body_f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yqrof"]
 size = Vector2(41, 82)
@@ -23,7 +23,7 @@ inventory = ExtResource("5_50fht")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = ExtResource("6_body")
-animation = &"idle"
+animation = &"shoot"
 
 [node name="FaceSprite" type="AnimatedSprite2D" parent="." unique_id=1905384956]
 

@@ -14,6 +14,7 @@ var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var is_attacking: bool = false
+var attack_anim: String = "attack"
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @export var stats: StatsData
@@ -80,7 +81,7 @@ func _physics_process(_delta: float) -> void:
 	if is_dashing:
 		animated_sprite.play("dash")
 	elif is_attacking:
-		animated_sprite.play("attack", stats.attack_speed * inventory.get_attack_speed())
+		animated_sprite.play(attack_anim, stats.attack_speed * inventory.get_attack_speed())
 	elif not is_on_floor():
 		animated_sprite.play("jump")
 	elif direction != 0:
@@ -92,6 +93,7 @@ func _physics_process(_delta: float) -> void:
 func _attack() -> void:
 	var damage := stats.attack_power + inventory.get_attack_power_bonus()
 	var weapon := inventory.equipped.get("weapon") as WeaponData
+	attack_anim = weapon.attack_animation if weapon else "attack"
 	if weapon and weapon.attack_type == "projectile":
 		_shoot(weapon.projectile_scene, damage)
 		return
@@ -146,5 +148,5 @@ func _shoot(scene: PackedScene, damage: int) -> void:
 	get_parent().add_child(projectile)
 
 func _on_animation_finished() -> void:
-	if animated_sprite.animation == "attack":
+	if animated_sprite.animation == attack_anim:
 		is_attacking = false
