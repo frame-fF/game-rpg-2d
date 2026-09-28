@@ -23,7 +23,7 @@ inventory = ExtResource("5_50fht")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = ExtResource("6_body")
-animation = &"shoot"
+animation = &"jump"
 
 [node name="FaceSprite" type="AnimatedSprite2D" parent="." unique_id=1905384956]
 

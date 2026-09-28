@@ -79,7 +79,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("14_ghoj8")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"jump",
 "speed": 5.0
 }, {
