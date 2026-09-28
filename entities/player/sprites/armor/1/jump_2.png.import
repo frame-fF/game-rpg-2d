@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0cn472yx27ui"
-path="res://.godot/imported/dash_1.png-6d5e083cd24875f4b5e3518bab94b4eb.ctex"
+uid="uid://bv14oylv1362d"
+path="res://.godot/imported/jump_2.png-16f8996800ccf8a22be843818c8ff639.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/armor/m_1/dash_1.png"
-dest_files=["res://.godot/imported/dash_1.png-6d5e083cd24875f4b5e3518bab94b4eb.ctex"]
+source_file="res://entities/player/sprites/armor/1/jump_2.png"
+dest_files=["res://.godot/imported/jump_2.png-16f8996800ccf8a22be843818c8ff639.ctex"]
 
 [params]
 
