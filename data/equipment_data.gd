@@ -7,6 +7,7 @@ class_name EquipmentData
 @export_enum("weapon", "armor", "face") var slot: String = "weapon"
 @export var sprite_frames_male: SpriteFrames
 @export var sprite_frames_female: SpriteFrames # ว่างไว้ = ใช้ของ male แทน
+@export_enum("any", "male", "female") var gender_lock: String = "any"
 
 @export var max_hp_bonus: int = 0
 @export var hp_bonus: int = 0
@@ -26,3 +27,6 @@ func get_frames(gender: String) -> SpriteFrames:
 	if gender == "female" and sprite_frames_female:
 		return sprite_frames_female
 	return sprite_frames_male
+
+func can_equip(gender: String) -> bool:
+	return gender_lock == "any" or gender_lock == gender

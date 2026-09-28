@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 @export var inventory: InventoryData
+@export var appearance: AppearanceData
 @onready var panel: PanelContainer = %Panel
 @onready var grid: GridContainer = %Grid
 
@@ -28,5 +29,6 @@ func _refresh() -> void:
 		button.toggle_mode = true
 		button.focus_mode = Control.FOCUS_NONE
 		button.button_pressed = inventory.is_equipped(item)
-		button.pressed.connect(inventory.toggle_equip.bind(item))
+		button.disabled = not item.can_equip(appearance.gender) and not button.button_pressed
+		button.pressed.connect(func(): inventory.toggle_equip(item, appearance.gender))
 		grid.add_child(button)

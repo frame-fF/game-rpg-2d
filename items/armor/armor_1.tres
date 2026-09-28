@@ -12,4 +12,5 @@ icon = ExtResource("1_cq2fu")
 slot = "armor"
 sprite_frames_male = ExtResource("2_jylhi")
 sprite_frames_female = ExtResource("9_female")
+gender_lock = "male"
 metadata/_custom_type_script = "uid://dsnryq0h70574"

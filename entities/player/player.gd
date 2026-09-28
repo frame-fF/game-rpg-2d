@@ -31,7 +31,7 @@ func _ready() -> void:
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
-	appearance.changed.connect(_refresh_sprites)
+	appearance.changed.connect(_on_appearance_changed)
 	_refresh_sprites()
 	attack_shape.shape = attack_shape.shape.duplicate()
 	_set_attack_range(unarmed_range)
@@ -106,6 +106,10 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 		_set_attack_range(weapon.attack_range if weapon and weapon.attack_range > 0 else unarmed_range)
 	_refresh_sprites()
 
+func _on_appearance_changed() -> void:
+	inventory.unequip_locked(appearance.gender)
+	_refresh_sprites()
+	
 func _refresh_sprites() -> void:
 	animated_sprite.sprite_frames = body_frames_female if appearance.gender == "female" else body_frames_male
 	face_sprite.sprite_frames = _frames_of(appearance.face)
