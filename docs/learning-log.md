@@ -52,27 +52,31 @@
 ```
 data/                          ← สคริปต์แม่แบบ Resource (class_name) ใช้ร่วมกันทั้งเกม
 ├── stats_data.gd
-├── equipment_data.gd
+├── equipment_data.gd          ← แม่ของไอเทมทุกชนิด
+├── weapon_data.gd, armor_data.gd  ← ลูก (extends EquipmentData)
+├── appearance_data.gd
 └── inventory_data.gd
-items/                         ← ข้อมูลไอเทมจริง (.tres) = ตัวไอเทม + SpriteFrames ของมัน
-├── armor/   armor_1.tres, armor_1_frames.tres
-├── weapons/ weapon_1.tres, weapon_1_frames.tres
-└── face/    face_1.tres, face_1_frames.tres
+items/                         ← ข้อมูลไอเทมจริง (.tres) = ตัวไอเทม + SpriteFrames แยกเพศ
+├── armor/   armor_1.tres, armor_1_frames_m.tres, armor_1_frames_f.tres
+├── weapons/ weapon_1.tres, weapon_1_frames_m.tres, weapon_1_frames_f.tres
+└── face/    face_1.tres, face_1_frames_m.tres, face_1_frames_f.tres
 entities/player/
 ├── player.tscn, player.gd
 ├── player_stats.tres, player_inventory.tres, player_appearance.tres
+├── body_frames_m.tres, body_frames_f.tres   ← SpriteFrames ตัวละครแยกเพศ
 └── sprites/
-    ├── base_body_m/           ← เฟรมตัว (idle_0, walk_3, ...)
-    ├── armor/1/               ← เฟรมชุด + icon.png
-    ├── weapons/1/             ← เฟรมดาบ + icon.png
-    └── face/1/                ← เฟรมหน้า + icon.png
+    ├── base_body/m/, base_body/f/   ← เฟรมตัว (idle_0, walk_3, ...)
+    ├── armor/1/               ← icon.png + m/ + f/ (เฟรมแต่ละเพศ)
+    ├── weapons/1/             ← icon.png + m/ + f/
+    └── face/1/                ← icon.png + m/ + f/
 entities/dummy/                ← dummy.tscn, dummy.gd, dummy_stats.tres (แม่แบบ)
 entities/projectiles/          ← projectile.gd, arrow.tscn
 ui/hud/, ui/inventory/
 levels/village.tscn            ← ด่านทดสอบ
 ```
 **กติกาตั้งชื่อ:**
-- ไอเทม 1 ชิ้น = 1 โฟลเดอร์รูป (เฟรมทุกท่า + `icon.png`) + 2 ไฟล์ใน `items/` (`<ประเภท>_<เลข>.tres` + `<ประเภท>_<เลข>_frames.tres`)
+- ไอเทม 1 ชิ้น = 1 โฟลเดอร์รูป (`icon.png` + โฟลเดอร์ `m/` `f/` เก็บเฟรมทุกท่า) + 3 ไฟล์ใน `items/` (`<ประเภท>_<เลข>.tres` + `<ประเภท>_<เลข>_frames_m.tres` + `..._frames_f.tres`)
+- ของที่แยกเพศลงท้ายด้วย `_m` / `_f` เสมอ (ทั้งไฟล์และชื่อตัวแปร `sprite_frames_male` / `sprite_frames_female`) อ่านแล้วรู้ทันทีว่าของเพศไหน
 - ใช้**เลขล้วน** ไม่เติม 0 นำหน้า (`1`, `2` ไม่ใช่ `01`) และใช้แบบเดียวกันทั้งชุดและอาวุธ
 - ชื่อเฟรมตามท่า `<ท่า>_<ลำดับ>.png` (`idle_0`, `walk_5`) อ่านง่ายกว่าเลข `0.png`-`57.png` ของ asset ดิบ
 
@@ -419,6 +423,8 @@ func _refresh() -> void:
 - ห้ามลบไฟล์ `.uid` / `.import` ทิ้งเองตอนย้าย (ดู 5.10)
 
 ### 3.13 หน้าตาตัวละคร (Face) — ไม่ใช่ของในกระเป๋า แต่เก็บเป็นไอเทม
+> โค้ด/ชื่อไฟล์ในหัวข้อนี้เป็นเวอร์ชันแรก — ปัจจุบัน `_apply_appearance` ถูกแทนด้วย `_refresh_sprites` และไฟล์แยกเพศแล้ว (ดู 3.19)
+
 **การออกแบบ:** หน้าเป็น "หน้าตาตัวละคร" ผู้เล่นเปลี่ยนได้ตลอด เก็บใน Resource แยก `AppearanceData` แต่ตัวหน้าเองเก็บเป็น `EquipmentData` (slot = `face`) — วันหน้าอยากให้เป็นของในกระเป๋า/ร้านค้า ก็แค่เพิ่มลง `player_inventory.tres` ไม่ต้องสร้างข้อมูลใหม่
 ```
 items/face/face_1.tres, face_1_frames.tres    ← ไอเทมหน้า + SpriteFrames
@@ -593,7 +599,97 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 - ต้องประกาศ `slot_sprites` **หลัง** `@onready` ของทุก node ที่อยู่ในตาราง (`@onready` ทำตามลำดับบรรทัด)
 - `[a, b] + dict.values()` ต่อรายการ 2 ชุดเพื่อวนลูปเดียว
 - node `HatSprite` อยู่ใต้ `ArmorSprite` (หมวกทับชุด ใต้ดาบ)
-- รูปหมวก: ทำ `idle_0` ใน Aseprite แล้วเลื่อนตามตำแหน่งหัว (ดู 3.13) เก็บ `sprites/hat/1/` → `items/hat/hat_1.tres` + `hat_1_frames.tres`
+- รูปหมวก: ทำ `idle_0` ใน Aseprite แล้วเลื่อนตามตำแหน่งหัว (ดู 3.13) เก็บ `sprites/hat/1/m/` → `items/hat/hat_1.tres` + `hat_1_frames_m.tres`
+- ⚠️ โค้ดตัวอย่างข้างบนเขียนก่อนมีระบบเพศ — ตอนทำจริงให้ต่อยอดจาก `_refresh_sprites` (3.19) แทน
+
+### 3.18 แยกคลาสไอเทม + ตั้งชื่อ stat ให้เป็นระบบ
+**แยกคลาส:** ของที่มีเฉพาะอาวุธ (ระยะ, แบบโจมตี, กระสุน) ย้ายออกจาก `EquipmentData` ไปอยู่ในลูก
+```gdscript
+# data/weapon_data.gd
+extends EquipmentData
+class_name WeaponData
+
+@export var attack_range: float = 0.0 # 0 = ใช้ระยะหมัด
+@export_enum("melee", "projectile") var attack_type: String = "melee"
+@export var projectile_scene: PackedScene
+```
+`data/armor_data.gd` = `extends EquipmentData` + `class_name ArmorData` (ยังว่าง ไว้ใส่ของเฉพาะชุดทีหลัง)
+- **กติกา:** field ที่ไอเทม*ทุกชนิด*มีได้ → ไว้ในแม่ `EquipmentData` / field ของ*บางกลุ่ม* → ไว้ในลูก
+- ใช้ในโค้ด: `var weapon := item as WeaponData` → ถ้าไม่ใช่อาวุธได้ `null` (ไม่ error)
+- `.tres` ของอาวุธต้องสร้างจาก `WeaponData` (New Resource → WeaponData) ไม่งั้นไม่มีช่อง attack_range
+
+**ตั้งชื่อ stat:**
+- `_bonus` = **บวกเพิ่ม** ค่าเริ่มต้น `0` (`attack_power_bonus`, `defense_bonus`, `max_hp_bonus`)
+- `_multiplier` = **คูณ** ค่าเริ่มต้น `1.0` (`attack_speed_multiplier`, `move_speed_multiplier`) — ใน `InventoryData` รวมด้วยการคูณ (`total *= ...`)
+- ค่าที่เป็นของอาวุธเองใช้ชื่อตรงๆ ไม่มีคำต่อท้าย (`attack_range`)
+
+**ปัญหาที่เจอ:**
+- สร้าง `weapon_data.gd` ตอนแม่ยังมี field ชื่อเดียวกัน → `member already exists in parent` และ Inspector ไม่โชว์ช่องอะไรเลย แม้ลบออกจากแม่แล้ว → **Project → Reload Current Project**
+- เปลี่ยนชื่อ/ลบ `@export` แล้ว ค่าเก่าในไฟล์ `.tres` **ไม่ย้ายตามชื่อใหม่** (เช่น `hp = 100` ค้างใน armor_1.tres) → กรอกค่าใหม่แล้วเซฟ บรรทัดเก่าจะหาย หรือแก้ชื่อในไฟล์ด้วย text editor ตรงๆ
+- `attack_type = projectile` แต่ไม่ใส่ `projectile_scene` → เลือก**ปล่อยให้ error** (fail-fast) จะได้รู้ทันทีว่าลืมใส่ ไม่เงียบ
+
+### 3.19 ระบบเพศตัวละคร (male / female)
+**แนวคิด:** เพศเก็บใน `AppearanceData` / ไอเทมทุกชิ้นมีเฟรม 2 ชุด / ถ้าไม่มีเฟรมผู้หญิง **ใช้ของผู้ชายแทน (fallback)** ไอเทมใหม่เลยทำแค่ `m` ก่อนก็ใช้ได้
+```
+player_appearance.tres  gender = "male" | "female"
+EquipmentData           sprite_frames_male / sprite_frames_female + get_frames(gender)
+Player                  body_frames_male / body_frames_female + _refresh_sprites()
+```
+`appearance_data.gd` เพิ่ม:
+```gdscript
+@export_enum("male", "female") var gender: String = "male":
+	set(value):
+		gender = value
+		emit_changed()
+```
+`equipment_data.gd` เพิ่ม:
+```gdscript
+@export var sprite_frames_male: SpriteFrames
+@export var sprite_frames_female: SpriteFrames # ว่างไว้ = ใช้ของ male แทน
+
+func get_frames(gender: String) -> SpriteFrames:
+	if gender == "female" and sprite_frames_female:
+		return sprite_frames_female
+	return sprite_frames_male
+```
+Player — รวมการตั้งเฟรม**ทุกชั้น**ไว้ที่เดียว:
+```gdscript
+@export var body_frames_male: SpriteFrames
+@export var body_frames_female: SpriteFrames
+
+# ใน _ready()
+	appearance.changed.connect(_refresh_sprites)
+	_refresh_sprites()
+
+func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
+	if slot == "weapon":
+		var weapon := item as WeaponData
+		_set_attack_range(weapon.attack_range if weapon and weapon.attack_range > 0 else unarmed_range)
+	_refresh_sprites()
+
+func _refresh_sprites() -> void:
+	animated_sprite.sprite_frames = body_frames_female if appearance.gender == "female" else body_frames_male
+	face_sprite.sprite_frames = _frames_of(appearance.face)
+	armor_sprite.sprite_frames = _frames_of(inventory.equipped.get("armor"))
+	weapon_sprite.sprite_frames = _frames_of(inventory.equipped.get("weapon"))
+	_sync_layers()
+
+func _frames_of(item: EquipmentData) -> SpriteFrames:
+	return item.get_frames(appearance.gender) if item else null
+```
+- **ทำไมรวมเป็นฟังก์ชันเดียว:** เปลี่ยนเพศ = ทุกชั้นต้องเปลี่ยนพร้อมกัน ถ้าตั้งเฟรมแยกกันตามที่ต่างๆ (เดิม: ชุด/ดาบตั้งตอนใส่ของ, หน้าตั้งตอน appearance เปลี่ยน) ชุดกับดาบจะค้างเป็นเพศเดิม
+- ใส่ของ / ถอดของ / เปลี่ยนเพศ / เปลี่ยนหน้า → ทุกทางเรียก `_refresh_sprites()` ที่เดียว
+- เปลี่ยน `sprite_frames` ของ AnimatedSprite2D ระหว่างเล่นได้เลย ท่าที่เล่นอยู่ไม่หลุด ถ้าชื่อท่าในไฟล์ใหม่ตรงกัน
+
+**ขั้นตอนที่ทำ:**
+1. จัดโฟลเดอร์รูป: `base_body_m/` → `base_body/m/`, เฟรมไอเทมย้ายลง `<ไอเทม>/1/m/` (`icon.png` อยู่ระดับไอเทม ใช้ร่วมทุกเพศ) — ย้ายผ่าน Godot แล้วแก้ path ค้างในไฟล์ (3.12)
+2. สร้าง `f/` จาก `m/` — **ก๊อปแค่ `.png` ไม่เอา `.import`** แล้วให้ Godot import ใหม่ จะได้ uid ใหม่ไม่ซ้ำ (ดู 5.11)
+3. เปลี่ยนชื่อ `sprite_frames` → `sprite_frames_male` และไฟล์ `*_frames.tres` → `*_frames_m.tres`
+4. SpriteFrames ของตัวที่ฝังอยู่ใน `player.tscn` แยกออกเป็นไฟล์ `body_frames_m.tres` (Inspector → Sprite Frames ▾ → **Save As...**) ถึงจะเอาไปใส่ช่อง export ได้
+5. สร้าง `*_frames_f.tres` ให้ชี้รูปใน `f/` แล้วใส่ช่อง `sprite_frames_female` / `body_frames_female`
+
+- ตอนนี้รูปใน `f/` ยังเหมือน `m/` ทุกพิกเซล → แก้สี/วาดใหม่ใน Aseprite ได้เลย ไม่ต้องแก้โค้ด
+- ถ้าตั้ง gender = female แต่ช่อง `body_frames_female` ว่าง → **ตัวละครหายทั้งตัว**
 
 ---
 
@@ -646,6 +742,14 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 ### 5.10 ไฟล์ `.uid`
 Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อัตโนมัติ (ตั้งแต่ Godot 4.3+) เก็บรหัสอ้างอิงไม่ให้ path เปลี่ยนแล้วพัง **ห้ามเอา `uid=` ของสคริปต์เก่าที่ลบไปแล้วไปแปะใน `.tscn` ใหม่** เพราะ Godot จะโหลดสคริปต์ผิดแบบเงียบๆ ไม่มี error ชัดเจน
 
+### 5.11 ก๊อปไฟล์แล้ว uid ซ้ำ → โหลดไฟล์ผิดแบบเงียบๆ
+- **ก๊อปรูป:** ห้ามก๊อปใน Windows Explorer พร้อมไฟล์ `.import` (uid ติดไปด้วย = 2 รูปมี uid เดียวกัน) → ก๊อป**แค่ `.png`** แล้วให้ Godot import ใหม่ หรือใช้คลิกขวา → **Duplicate...** ใน Godot
+- **ก๊อป `.tres` แล้วแก้แค่ path ไม่พอ:** Godot เชื่อ `uid=` ก่อน `path=` → ถ้าก๊อป `armor_1_frames_m.tres` แล้วเปลี่ยน `/m/` เป็น `/f/` อย่างเดียว มันจะ**ยังโหลดรูปใน `m/`** อยู่ ต้องเปลี่ยน uid ให้เป็นของรูปใหม่ด้วย (ดูได้จากบรรทัด `uid=` ในไฟล์ `.import` ของรูป) หรือลบ `uid="..."` ทิ้ง
+- ลบ `uid="..."` บนบรรทัดแรก (`[gd_resource ...]`) ของไฟล์ที่ก๊อปมาด้วย ไม่งั้น 2 ไฟล์มี uid ตัวเองซ้ำกัน
+
+### 5.12 แก้ไฟล์ข้างนอก Godot แล้ว editor ยังเห็นของเก่า
+เปลี่ยนชื่อตัวแปรใน `.gd` ด้วย text editor แล้ว Inspector ยังโชว์ชื่อเก่า → **Project → Reload Current Project** ก่อนแก้อะไรต่อ ถ้ากดเซฟไอเทมตอนที่ Inspector ยังเป็นชื่อเก่า ชื่อเก่าจะถูกเขียนกลับลงไฟล์
+
 ---
 
 ## 6. เช็คลิสต์ก่อนบอกว่า "เสร็จแล้ว" (ทำทุกครั้งหลังแก้ `.tscn`/`.gd`)
@@ -668,6 +772,9 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 - [x] ทบทวนโปรเจกต์ 4 ข้อ (export_enum, input action ของเกม, duplicate stats มอนสเตอร์, ดาเมจไม่เขียนทับ stats)
 - [x] ระยะโจมตีตามอาวุธ + ท่าโจมตีจบด้วย `animation_finished`
 - [x] อาวุธตีไกล (ระบบกระสุน `Projectile`) — ยังไม่มีรูปธนู/ลูกธนู
+- [x] แยกคลาส `WeaponData` / `ArmorData` + ตั้งชื่อ `_bonus` / `_multiplier` (ดู 3.18)
+- [x] ระบบเพศ male/female + fallback เป็นของผู้ชาย (ดู 3.19) — รูปใน `f/` ยังเป็นสำเนาของ `m/`
+- [ ] วาดรูปผู้หญิงจริง (ตัว + ชุด + หน้า) ใน `f/`
 - [ ] หมวก + ตาราง `slot_sprites` (ดู 3.17)
 - [ ] Item pickup (เก็บของจากพื้น) / ไอเทมใช้แล้วหมด (ยา)
 - [ ] Skill system (cooldown, mana cost, effect)

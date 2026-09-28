@@ -22,6 +22,8 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var weapon_sprite: AnimatedSprite2D = $WeaponSprite
 @onready var face_sprite: AnimatedSprite2D = $FaceSprite
 @export var appearance: AppearanceData
+@export var body_frames_male: SpriteFrames
+@export var body_frames_female: SpriteFrames
 
 @export var inventory: InventoryData
 
@@ -29,8 +31,8 @@ func _ready() -> void:
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
-	appearance.changed.connect(_apply_appearance)
-	_apply_appearance()
+	appearance.changed.connect(_refresh_sprites)
+	_refresh_sprites()
 	attack_shape.shape = attack_shape.shape.duplicate()
 	_set_attack_range(unarmed_range)
 	animated_sprite.animation_finished.connect(_on_animation_finished)
@@ -75,8 +77,6 @@ func _physics_process(_delta: float) -> void:
 	face_sprite.flip_h = facing_direction < 0
 	attack_area.position.x = (ATTACK_START + attack_range / 2) * facing_direction
 
-
-
 	if is_dashing:
 		animated_sprite.play("dash")
 	elif is_attacking:
@@ -100,21 +100,21 @@ func _attack() -> void:
 			body.take_damage(damage)
 
 
-
 func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
-	var frames: SpriteFrames = item.sprite_frames_male if item else null
 	if slot == "weapon":
-		weapon_sprite.sprite_frames = frames
 		var weapon := item as WeaponData
 		_set_attack_range(weapon.attack_range if weapon and weapon.attack_range > 0 else unarmed_range)
+	_refresh_sprites()
 
-	elif slot == "armor":
-		armor_sprite.sprite_frames = frames
+func _refresh_sprites() -> void:
+	animated_sprite.sprite_frames = body_frames_female if appearance.gender == "female" else body_frames_male
+	face_sprite.sprite_frames = _frames_of(appearance.face)
+	armor_sprite.sprite_frames = _frames_of(inventory.equipped.get("armor"))
+	weapon_sprite.sprite_frames = _frames_of(inventory.equipped.get("weapon"))
 	_sync_layers()
 
-func _apply_appearance() -> void:
-	face_sprite.sprite_frames = appearance.face.sprite_frames_male if appearance.face else null
-	_sync_layers()
+func _frames_of(item: EquipmentData) -> SpriteFrames:
+	return item.get_frames(appearance.gender) if item else null
 
 func _sync_layers() -> void:
 	for layer in [face_sprite, armor_sprite, weapon_sprite]:
