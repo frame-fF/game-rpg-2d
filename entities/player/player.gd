@@ -102,7 +102,7 @@ func _attack() -> void:
 
 
 func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
-	var frames: SpriteFrames = item.sprite_frames if item else null
+	var frames: SpriteFrames = item.sprite_frames_male if item else null
 	if slot == "weapon":
 		weapon_sprite.sprite_frames = frames
 		var weapon := item as WeaponData
@@ -113,7 +113,7 @@ func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	_sync_layers()
 
 func _apply_appearance() -> void:
-	face_sprite.sprite_frames = appearance.face.sprite_frames if appearance.face else null
+	face_sprite.sprite_frames = appearance.face.sprite_frames_male if appearance.face else null
 	_sync_layers()
 
 func _sync_layers() -> void:

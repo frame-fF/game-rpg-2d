@@ -9,5 +9,5 @@ script = ExtResource("1_fgwcq")
 item_name = "Face_1"
 icon = ExtResource("1_kylk4")
 slot = "face"
-sprite_frames = ExtResource("3_qeijp")
+sprite_frames_male = ExtResource("3_qeijp")
 metadata/_custom_type_script = "uid://dsnryq0h70574"

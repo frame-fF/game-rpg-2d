@@ -9,5 +9,5 @@ script = ExtResource("2_h6wsu")
 item_name = "armor_1"
 icon = ExtResource("1_cq2fu")
 slot = "armor"
-sprite_frames = ExtResource("2_jylhi")
+sprite_frames_male = ExtResource("2_jylhi")
 metadata/_custom_type_script = "uid://dsnryq0h70574"
