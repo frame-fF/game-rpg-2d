@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://entities/monsters/monster.tscn" id="1_base"]
+[ext_resource type="SpriteFrames" path="res://entities/monsters/2/frames.tres" id="2_frames"]
+[ext_resource type="Resource" path="res://entities/monsters/2/stats.tres" id="3_stats"]
+[ext_resource type="PackedScene" path="res://entities/projectiles/enemy_orb.tscn" id="4_orb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body2"]
+size = Vector2(40, 60)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detect2"]
+radius = 260.0
+
+[node name="Monster2" instance=ExtResource("1_base")]
+stats = ExtResource("3_stats")
+attack_range = 180.0
+attack_cooldown = 2.0
+attack_hit_frame = 2
+projectile_scene = ExtResource("4_orb")
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = ExtResource("2_frames")
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, 9)
+shape = SubResource("RectangleShape2D_body2")
+
+[node name="CollisionShape2D" parent="DetectArea" index="0"]
+shape = SubResource("CircleShape2D_detect2")
+
+[node name="AttackArea" parent="." index="3"]
+position = Vector2(31, -20)

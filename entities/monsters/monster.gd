@@ -1,19 +1,20 @@
 extends CharacterBody2D
 
-const ATTACK_HIT_FRAME := 1 # เฟรมที่ลิ้นยื่นสุด = จังหวะโดน
-const ATTACK_BOX_X := 42.0  # จุดกลางกล่องโจมตี (ลิ้นยื่น 10-74 px หน้าตัว)
-
 @export var stats: StatsData
 @export var patrol_distance: float = 100.0
 @export var attack_range: float = 70.0
 @export var attack_cooldown: float = 1.5
+@export var attack_hit_frame: int = 1 # เฟรมของท่า attack ที่ดาเมจเข้า
+@export var projectile_scene: PackedScene # ใส่ = ตีไกล (ยิงจากตำแหน่ง AttackArea), ว่าง = ตีประชิด
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var direction: float = 1.0
 var start_x: float
 var target: Node2D
 var is_attacking: bool = false
+var is_dead: bool = false
 var cooldown_timer: float = 0.0
+var attack_box_x: float # ระยะกล่องโจมตีจากตัว อ่านจากตำแหน่ง AttackArea ใน scene
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var detect_area: Area2D = $DetectArea
@@ -22,6 +23,7 @@ var cooldown_timer: float = 0.0
 func _ready() -> void:
 	stats = stats.duplicate()
 	start_x = position.x
+	attack_box_x = absf(attack_area.position.x)
 	detect_area.body_entered.connect(_on_detect_entered)
 	detect_area.body_exited.connect(_on_detect_exited)
 	sprite.frame_changed.connect(_on_frame_changed)
@@ -32,6 +34,11 @@ func _physics_process(delta: float) -> void:
 		velocity.y += gravity * delta
 	if cooldown_timer > 0.0:
 		cooldown_timer -= delta
+
+	if is_dead:
+		velocity.x = 0.0
+		move_and_slide()
+		return
 
 	if is_attacking:
 		velocity.x = 0.0
@@ -49,7 +56,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	sprite.flip_h = direction < 0
-	attack_area.position.x = ATTACK_BOX_X * direction
+	attack_area.position.x = attack_box_x * direction
 	if is_attacking:
 		sprite.play("attack")
 	elif velocity.x != 0.0:
@@ -71,15 +78,28 @@ func _start_attack() -> void:
 	cooldown_timer = attack_cooldown
 
 func _on_frame_changed() -> void:
-	if sprite.animation != "attack" or sprite.frame != ATTACK_HIT_FRAME:
+	if sprite.animation != "attack" or sprite.frame != attack_hit_frame:
+		return
+	if projectile_scene:
+		_shoot()
 		return
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage"):
 			body.take_damage(stats.attack_power)
 
+func _shoot() -> void:
+	var projectile := projectile_scene.instantiate() as Projectile
+	projectile.direction = direction
+	projectile.damage = stats.attack_power
+	projectile.shooter = self
+	projectile.position = position + attack_area.position
+	get_parent().add_child(projectile)
+
 func _on_animation_finished() -> void:
 	if sprite.animation == "attack":
 		is_attacking = false
+	elif sprite.animation == "die":
+		queue_free()
 
 func _on_detect_entered(body: Node2D) -> void:
 	target = body
@@ -89,7 +109,16 @@ func _on_detect_exited(body: Node2D) -> void:
 		target = null
 
 func take_damage(amount: int) -> void:
+	if is_dead:
+		return
 	stats.hp -= amount
 	print("Monster took ", amount, " damage. HP: ", stats.hp, "/", stats.max_hp)
 	if stats.hp <= 0:
-		queue_free()
+		die()
+
+func die() -> void:
+	is_dead = true
+	collision_layer = 0 # ตีซ้ำไม่ได้ ลูกธนูทะลุ
+	detect_area.set_deferred("monitoring", false)
+	attack_area.set_deferred("monitoring", false)
+	sprite.play("die")
