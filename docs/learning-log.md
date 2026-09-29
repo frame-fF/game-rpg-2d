@@ -57,8 +57,10 @@ data/                          ← สคริปต์แม่แบบ Resou
 ├── appearance_data.gd
 └── inventory_data.gd
 items/                         ← ข้อมูลไอเทมจริง (.tres) = ตัวไอเทม + SpriteFrames แยกเพศ
-├── armor/   armor_1.tres, armor_1_frames_m.tres, armor_1_frames_f.tres
-├── weapons/ weapon_1.tres, weapon_1_frames_m.tres, weapon_1_frames_f.tres
+├── armor/   armor_1_m.tres (ล็อก male), armor_1_f.tres (ล็อก female), armor_1_frames_m/f.tres
+├── weapons/
+│   ├── sword/1/  1.tres, 1_frames_m.tres, 1_frames_f.tres
+│   └── bow/1/    1.tres, 1_frames_m.tres, 1_frames_f.tres
 └── face/    face_1.tres, face_1_frames_m.tres, face_1_frames_f.tres
 entities/player/
 ├── player.tscn, player.gd
@@ -67,15 +69,23 @@ entities/player/
 └── sprites/
     ├── base_body/m/, base_body/f/   ← เฟรมตัว (idle_0, walk_3, ...)
     ├── armor/1/               ← icon.png + m/ + f/ (เฟรมแต่ละเพศ)
-    ├── weapons/1/             ← icon.png + m/ + f/
+    ├── weapons/sword/1/, weapons/bow/1/  ← icon.png + m/ + f/
     └── face/1/                ← icon.png + m/ + f/
+entities/monsters/
+├── monster.gd, monster.tscn   ← โค้ด/ฉากกลาง ใช้ทุกมอน
+├── 1/  sprites/, frames.tres, stats.tres               ← มอนตีประชิด (ลิ้น)
+└── 2/  sprites/, frames.tres, stats.tres, monster_2.tscn (Inherited)  ← มอนตีไกล (ผี)
 entities/dummy/                ← dummy.tscn, dummy.gd, dummy_stats.tres (แม่แบบ)
-entities/projectiles/          ← projectile.gd, arrow.tscn
+entities/projectiles/          ← projectile.gd, arrow.tscn (ผู้เล่น), enemy_orb.tscn (มอน)
 ui/hud/, ui/inventory/
 levels/village.tscn            ← ด่านทดสอบ
 ```
+นอกโปรเจกต์: `Desktop\assets\` = ต้นฉบับ ห้ามแก้ / `Desktop\Game Assets\` = รูปที่เปลี่ยนชื่อ + จัด canvas แล้ว (มี `note.txt` บอกเลขเฟรมต้นฉบับ) ก่อนก๊อปเข้าเกม (ดู 3.22)
+
 **กติกาตั้งชื่อ:**
-- ไอเทม 1 ชิ้น = 1 โฟลเดอร์รูป (`icon.png` + โฟลเดอร์ `m/` `f/` เก็บเฟรมทุกท่า) + 3 ไฟล์ใน `items/` (`<ประเภท>_<เลข>.tres` + `<ประเภท>_<เลข>_frames_m.tres` + `..._frames_f.tres`)
+- ไอเทม 1 ชิ้น = 1 โฟลเดอร์รูป (`icon.png` + โฟลเดอร์ `m/` `f/` เก็บเฟรมทุกท่า) + ไฟล์ใน `items/`
+- อาวุธแยกชนิดเป็นโฟลเดอร์ `weapons/<ชนิด>/<เลข>/` ทั้งรูปและไฟล์ไอเทม ไฟล์ข้างในชื่อแค่ `1.tres`, `1_frames_m.tres` (โฟลเดอร์บอกแล้วว่าเป็นอะไร)
+- `item_name` (ชื่อบนปุ่มกระเป๋า) แยกจากชื่อไฟล์ เช่น ไฟล์ `sword/1/1.tres` ชื่อไอเทม `sword_1`
 - ของที่แยกเพศลงท้ายด้วย `_m` / `_f` เสมอ (ทั้งไฟล์และชื่อตัวแปร `sprite_frames_male` / `sprite_frames_female`) อ่านแล้วรู้ทันทีว่าของเพศไหน
 - ใช้**เลขล้วน** ไม่เติม 0 นำหน้า (`1`, `2` ไม่ใช่ `01`) และใช้แบบเดียวกันทั้งชุดและอาวุธ
 - ชื่อเฟรมตามท่า `<ท่า>_<ลำดับ>.png` (`idle_0`, `walk_5`) อ่านง่ายกว่าเลข `0.png`-`57.png` ของ asset ดิบ
@@ -690,6 +700,107 @@ func _frames_of(item: EquipmentData) -> SpriteFrames:
 
 - ตอนนี้รูปใน `f/` ยังเหมือน `m/` ทุกพิกเซล → แก้สี/วาดใหม่ใน Aseprite ได้เลย ไม่ต้องแก้โค้ด
 - ถ้าตั้ง gender = female แต่ช่อง `body_frames_female` ว่าง → **ตัวละครหายทั้งตัว**
+- ท่าไหนเพิ่มในตัว (body) ต้องเพิ่มชื่อท่าเดียวกัน + **จำนวนเฟรมเท่ากัน** ในไฟล์ชุด/หน้าด้วย ไม่งั้น layer นั้นหายตอนเล่นท่านั้น (Loop/FPS ของ layer ไม่มีผล เพราะ layer แค่ก๊อปท่า+เฟรมจากตัว)
+
+### 3.20 ไอเทมจำกัดเพศ + แยกชุดชาย/หญิง
+`equipment_data.gd`:
+```gdscript
+@export_enum("any", "male", "female") var gender_lock: String = "any" # ค่าเริ่มต้น any = ลืมตั้งก็ใส่ได้ทุกเพศ
+
+func can_equip(gender: String) -> bool:
+	return gender_lock == "any" or gender_lock == gender
+```
+`inventory_data.gd` — กฎอยู่ที่**ข้อมูล** (วันหน้า server ใช้กฎชุดเดียวกัน):
+```gdscript
+func toggle_equip(item: EquipmentData, gender: String) -> void:
+	if is_equipped(item):
+		equipped.erase(item.slot)
+		equipment_changed.emit(item.slot, null)
+	elif item.can_equip(gender):
+		equipped[item.slot] = item
+		equipment_changed.emit(item.slot, item)
+
+func unequip_locked(gender: String) -> void:
+	for item in equipped.values(): # values() คืนสำเนา → ถอดระหว่างวนได้
+		if not item.can_equip(gender):
+			toggle_equip(item, gender)
+```
+- UI: `button.disabled = not item.can_equip(appearance.gender) and not button.button_pressed` (ปุ่มเทา แต่ถ้าใส่อยู่ยังกดถอดได้) + `button.pressed.connect(func(): inventory.toggle_equip(item, appearance.gender))` — **lambda** อ่านเพศล่าสุดตอนกด (`.bind` จะล็อกค่าตอนสร้างปุ่ม)
+- Player: `appearance.changed` → `_on_appearance_changed()` = `unequip_locked()` แล้ว `_refresh_sprites()` (เปลี่ยนเพศตอนใส่ของล็อก → ถอดให้เอง)
+- InventoryUi ต้องใส่ช่อง **Appearance** ใน `village.tscn`
+- `get_frames()` = **fallback** (ไม่มีรูปผู้หญิงก็ใช้รูปผู้ชาย) — เป็นกติกาที่ตั้งใจ ไม่ใช่การดัก error ถ้า `sprite_frames_male` ว่างจริง layer จะหายให้เห็น
+- เลือก**แยกเป็น 2 ชิ้น** (`armor_1_m.tres` ล็อก male / `armor_1_f.tres` ล็อก female) แบบเกมขายชุดชาย-หญิงแยก (อีกทางคือชิ้นเดียว `any` แล้วใช้ fallback)
+
+### 3.21 ท่าโจมตีตามอาวุธ + ธนู
+`weapon_data.gd`: `@export_enum("attack", "shoot") var attack_animation: String = "attack"` (เมนูเลือก กันพิมพ์ผิด / `@export_enum` ใช้กับ `String`, `int` ได้ ไม่รองรับ `StringName`)
+Player:
+```gdscript
+var attack_anim: String = "attack"
+# _attack():  attack_anim = weapon.attack_animation if weapon else "attack"
+# _physics_process: animated_sprite.play(attack_anim, ...)
+# _on_animation_finished: if animated_sprite.animation == attack_anim: is_attacking = false
+```
+- ท่า `shoot` ใน body **ปิด Loop** (โค้ดรอ `animation_finished`) — ท่าอื่นที่ไม่รอให้จบ (idle/walk/jump/dash) เปิด Loop ได้
+- ธนู `items/weapons/bow/1/1.tres`: Attack Type = projectile, Projectile Scene = `arrow.tscn`, Attack Animation = shoot
+- อาวุธมีท่าแค่บางท่า → ท่าที่ไม่มี อาวุธหาย (เช่น ธนูยังไม่มี `shoot`)
+- ยังไม่ทำ: ระยะลูกธนูตามอาวุธ (ตอนนี้ใช้ `max_distance` ของ `arrow.tscn` = 300 ทุกคัน)
+
+### 3.22 เตรียมรูปจาก asset (Game Assets)
+ขั้นตอน: `Desktop\assets\...\0.png-59.png` → ก๊อปไป `Desktop\Game Assets\...` ตั้งชื่อตามท่า (`idle_0`, `walk_3`) + จด `note.txt` (ท่า = เลขต้นฉบับ) → จัด canvas → ก๊อปเฉพาะ `.png` เข้าเกม
+- **Base Body M กับ F เลขเฟรมไม่ตรงกัน:** F มีเฟรมซ้ำเกิน 2 เฟรม → M 0-39 = F เลขเดียวกัน / M 40-57 = F +1 / M 58-59 = F +2 → **เปิดดูรูปทุกครั้ง อย่าใช้เลข M กับ F ตรงๆ** (ท่า shoot ของ F: ตัว 56-57, ชุด 55-56)
+- **รูป asset ถูกตัดขอบ (trim)** ขนาดแต่ละเฟรม/แต่ละ layer ไม่เท่ากัน → ต้องจัด canvas ก่อนใช้ (Godot วางจุดกลางรูปทุก layer ตรงกัน)
+  - **ชุด (อยู่บนตัว):** วางให้ตรงตัวแล้วใช้ canvas = ตัว + 20 ทุกด้าน
+  - **อาวุธ (ยื่นนอกตัว):** ขยาย canvas **Left = Right และ Top = Bottom** (ไม่จำเป็นต้องครบ 4 ด้าน แต่ต้องเท่ากันเป็นคู่) ดูที่แถบล่างของ Aseprite ว่าขนาด = ตัว + เลขคู่
+  - **มอนสเตอร์:** ทุกเฟรมใส่ canvas เดียวกัน ให้ตัวอยู่กลาง (ท่าตีที่ลิ้น/แขนยื่นจะไม่ทำให้ตัวกระตุก และ `flip_h` กลับด้านถูกจุด) — มอน 1 = 150x96, มอน 2 = 98x78
+- ห้ามเปลี่ยนขนาดไฟล์ตัวละครอีก เพราะชุดทุกชุดอิงขนาดนี้
+- หาตำแหน่งวางชุดอัตโนมัติ: เท้าชุดชิดเท้าตัว แล้วเลื่อนหาจุดที่ "เนื้อโผล่น้อยสุด + ชุดล้นตัวน้อยสุด" → ต้องเปิดดูด้วยตาซ้ำเสมอ
+
+### 3.23 มอนสเตอร์ (เดิน / ไล่ / ตี / ตาย) + ผู้เล่นโดนตี
+**Collision layer** (Project Settings → Layer Names → 2D Physics): 1 = world, 2 = player, 3 = monster
+| | Layer (ฉันเป็นอะไร) | Mask (ฉันชน/ตรวจเจออะไร) |
+|---|---|---|
+| Player | 2 | 1 |
+| Player AttackArea, arrow.tscn | – | 1 + 3 |
+| Monster | 3 | 1 → **เดินทะลุผู้เล่นได้** แบบ MapleStory |
+| Monster DetectArea / AttackArea | 0 | 2 |
+| enemy_orb.tscn (กระสุนมอน) | 0 | 1 + 2 |
+
+`monster.tscn`: CharacterBody2D + AnimatedSprite2D (walk วน / attack, die ไม่วน) + CollisionShape2D (ขอบล่างตรงเท้า) + **DetectArea** (วงกลมระยะมองเห็น) + **AttackArea** (กล่องตรงลิ้น/อาวุธ ตอนหันขวา)
+`monster.gd` (สรุป):
+- ไม่มีเป้า → `_patrol()` เดินไปมา ±`patrol_distance` จากจุดเกิด ชนกำแพงกลับตัว
+- `DetectArea.body_entered` → `target = body` / `body_exited` → เลิกไล่
+- มีเป้า → หันหา เดินเข้าหา ถึง `attack_range` แล้วหยุด → ตีเมื่อ cooldown หมด
+- ดาเมจเข้าที่ **เฟรมที่กำหนด** (`attack_hit_frame`) ผ่าน `frame_changed` ไม่ใช่ตอนเริ่มท่า
+- `attack_box_x = absf(attack_area.position.x)` อ่านจาก scene ตอน `_ready` → มอนตัวใหม่แค่ลากกล่องไปวางใน editor
+- ตาย: `die()` → `is_dead`, `collision_layer = 0` (ตีซ้ำไม่ได้), ปิด Area ด้วย `set_deferred("monitoring", false)` (ปิดทันทีระหว่าง physics ไม่ได้), เล่น `die` → `animation_finished` ค่อย `queue_free()`
+
+ผู้เล่นโดนตี (`player.gd`):
+```gdscript
+func take_damage(amount: int) -> void:
+	var damage := maxi(1, amount - (stats.defense + inventory.get_defense_bonus()))
+	stats.hp = maxi(stats.hp - damage, 0)
+```
+- **HUD อัปเดตสด:** `StatsData.hp` มี setter เรียก `emit_changed()` → HUD `stats.changed.connect(_refresh)`
+- ทั้งผู้เล่นและมอนตีกันด้วยวิธีเดียว: **กล่องโจมตี + `take_damage()`** (วันหน้ายกเป็นระบบสกิลกลาง)
+- Stats มอนใช้คลาส `StatsData` เดียวกับผู้เล่น แต่คนละไฟล์ + `duplicate()` ต่อตัว (ช่อง level/exp/mp มีติดมาแต่ไม่ใช้) วันหน้ามีช่องเฉพาะมอน (exp_reward) → `MonsterStats extends StatsData`
+- ระวังระยะมองเห็นตอนวางมอน: ที่ x = -300 มอนเดินมาเห็นผู้เล่นตั้งแต่จุดเกิด → ย้ายไป -500
+
+### 3.24 มอนตีไกล + Inherited Scene
+`monster.gd`: `@export var projectile_scene: PackedScene` — **ใส่ = ยิง / ว่าง = ตีประชิด** (แบบเดียวกับอาวุธผู้เล่น)
+```gdscript
+func _shoot() -> void:
+	var projectile := projectile_scene.instantiate() as Projectile
+	projectile.direction = direction
+	projectile.damage = stats.attack_power   # ดาเมจมาจากมอนที่ยิง ไม่ใช่ตัวกระสุน
+	projectile.shooter = self
+	projectile.position = position + attack_area.position   # ยิงออกจากตำแหน่ง AttackArea
+	get_parent().add_child(projectile)
+```
+- **มอนตัวใหม่ = คลิกขวา `monster.tscn` → New Inherited Scene** แล้วเปลี่ยนแค่ค่าที่ต่าง (frames, stats, ระยะ, cooldown, ขนาดกล่อง) → แก้ `monster.gd` ที่เดียวมีผลทุกตัว
+- **ไม่แยก `monster.gd` ตัวละไฟล์** (แก้บั๊กต้องแก้ทุกไฟล์) — แยกเฉพาะมอนพิเศษจริง (บอส) ด้วย `extends "res://entities/monsters/monster.gd"`
+- **กระสุน:** ใช้ `projectile.gd` ตัวเดียวทุกลูก ต่างกันที่ scene (รูป/ความเร็ว/ระยะ/mask) → กระสุนแบบใหม่ = Inherited Scene จาก `enemy_orb.tscn` / มอนหลายตัวใช้กระสุนเดียวกันได้ (ดาเมจต่างตาม `attack_power` ของมอน)
+- `attack_range` ของมอนต้อง **น้อยกว่า** `max_distance` ของกระสุน ไม่งั้นยิงไม่ถึง
+- มอน 2 (ผี): ยิงเฟรมที่ 2 (มือยกสูงสุด) ระยะยืนยิง 180, มองเห็น 260, cooldown 2 วิ
 
 ---
 
@@ -750,6 +861,22 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 ### 5.12 แก้ไฟล์ข้างนอก Godot แล้ว editor ยังเห็นของเก่า
 เปลี่ยนชื่อตัวแปรใน `.gd` ด้วย text editor แล้ว Inspector ยังโชว์ชื่อเก่า → **Project → Reload Current Project** ก่อนแก้อะไรต่อ ถ้ากดเซฟไอเทมตอนที่ Inspector ยังเป็นชื่อเก่า ชื่อเก่าจะถูกเขียนกลับลงไฟล์
 
+### 5.13 ขยาย canvas ดาบแค่ด้านบน → ดาบลอยต่ำกว่ามือ
+ตัว 56x74 แต่ไฟล์ดาบ 96x94 (ซ้าย 20 ขวา 20 **บน 20 ล่าง 0**) → จุดกลางไฟล์ดาบเลื่อนขึ้น 10 (ครึ่งของ 20) → Godot วางจุดกลางตรงกัน ดาบเลยต่ำไป 10 px
+**กติกา:** Left = Right, Top = Bottom เสมอ ถึงดาบไม่ยื่นลงล่างก็ต้องเติมล่างให้เท่าบน / ตอนทำชุดสมัยก่อนขยายแค่บนแล้วยังตรง เพราะตอนนั้น**ไฟล์ตัวถูกเซฟขยายไปด้วย** (2 ไฟล์ขนาดเท่ากัน = จุดกลางตรงกันเอง) — หลักจริงคือ "ขนาดเท่ากัน" หรือ "ขยายเท่ากันเป็นคู่"
+
+### 5.14 เปลี่ยนขนาดไฟล์ตัวละครแล้วชุดพังหมด
+ชุดทุกชุดทำมาตามขนาดไฟล์ตัว ถ้าขยาย canvas ตัว (เพื่อเผื่อที่ให้อาวุธ) แล้วเซฟ จุดกลางตัวเลื่อน ชุดทั้งหมดไม่ตรง → **ห้ามเซฟไฟล์ตัว** ให้ขยายเฉพาะไฟล์อาวุธ (ใน Aseprite: ขยาย → วาดใน layer ใหม่ → ซ่อน layer ตัว → Export As → ปิดแบบ Don't Save) / ถ้าเผลอเซฟ ดึงคืนจาก git ได้
+
+### 5.15 Godot ย้ายไฟล์ไม่ได้: "Move requires dependency path rewrites"
+ไฟล์ที่ถูกอ้างถึงด้วย `path=` อย่างเดียว (ไม่มี `uid=` เช่นไฟล์ที่สร้างด้วยมือ) → Godot ย้ายแล้วแก้ path ในไฟล์ที่อ้างถึงให้ไม่ได้ → แก้ path ในไฟล์ที่อ้างถึงเองก่อน แล้วค่อยย้าย / พอ Godot เซฟไฟล์นั้นครั้งถัดไปจะเติม uid ให้เอง
+
+### 5.16 มอนตายแล้วหายทันที ไม่เล่นท่าตาย
+`take_damage()` เรียก `queue_free()` ตอนเลือดหมด → ถูกลบก่อนท่า `die` ได้แสดงสักเฟรม → เปลี่ยนเป็น `die()` ที่เล่นท่าก่อน แล้ว `queue_free()` ใน `animation_finished` (ดู 3.23)
+
+### 5.17 เครื่องมือแก้ไฟล์ติด "classifier gave no verdict" ใน Auto mode
+ตัวตรวจความปลอดภัยของโหมด Auto ล่ม → แก้ไฟล์ไม่ได้เลยแม้บรรทัดเดียว → กด Shift+Tab เปลี่ยนเป็น **Edit automatically** หรือ **Manual** ชั่วคราว
+
 ---
 
 ## 6. เช็คลิสต์ก่อนบอกว่า "เสร็จแล้ว" (ทำทุกครั้งหลังแก้ `.tscn`/`.gd`)
@@ -763,7 +890,7 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 ## 7. Roadmap ที่เหลือ (อ้างอิงจาก `rpg-online-plan.md`)
 
 - [x] Movement + collision (เดิน, กระโดด, พุ่ง, ชนกำแพง)
-- [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP เสร็จแล้ว (ยังไม่ live-update รอระบบต่อสู้)
+- [x] ระบบ Stats (HP/MP/EXP/Level) — `StatsData` resource + HUD แสดงหลอด HP อัปเดตสดแล้ว (3.23)
 - [x] ระบบต่อสู้พื้นฐาน — โจมตี Dummy ด้วย Area2D hitbox, ลด HP, ตายแล้ว `queue_free()`, มี animation attack จริง
 - [x] ระบบ Equipment (ชุดเกราะ + อาวุธ) — `EquipmentData` resource, layered sprite หลายเลเยอร์ sync ด้วย signal, ชุดครบทุกท่า
 - [ ] ดาบติดมือ — ทำแล้วเฉพาะท่า `idle` (มีเฟรมตัวอย่างครบทุกท่าที่ `Desktop\assets\sword_frames\`)
@@ -774,7 +901,18 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 - [x] อาวุธตีไกล (ระบบกระสุน `Projectile`) — ยังไม่มีรูปธนู/ลูกธนู
 - [x] แยกคลาส `WeaponData` / `ArmorData` + ตั้งชื่อ `_bonus` / `_multiplier` (ดู 3.18)
 - [x] ระบบเพศ male/female + fallback เป็นของผู้ชาย (ดู 3.19) — รูปใน `f/` ยังเป็นสำเนาของ `m/`
-- [ ] วาดรูปผู้หญิงจริง (ตัว + ชุด + หน้า) ใน `f/`
+- [x] รูปผู้หญิงจริง: ตัว (Base Body F) + ชุด Blood Crow F — หน้ายังเป็นสำเนา
+- [x] ไอเทมจำกัดเพศ (`gender_lock`) + ชุด armor_1_m / armor_1_f (3.20)
+- [x] ท่าโจมตีตามอาวุธ (`attack_animation`, ท่า `shoot`) + ธนู bow_1 (3.21)
+- [x] มอนสเตอร์: เดินไปมา / เห็นแล้วไล่ / ตี / ท่าตาย + ผู้เล่นโดนตี (defense) (3.23)
+- [x] มอนตีไกล (`projectile_scene`) + Inherited Scene (3.24)
+- [ ] มอนโดนตีแล้วไล่คนตี (`take_damage(amount, attacker)`)
+- [ ] EXP ตอนฆ่ามอน + เลเวลอัป / มอนคิด defense
+- [ ] ผู้เล่นตาย → เกิดใหม่ / มอนเกิดใหม่ (MonsterSpawner)
+- [ ] ระยะลูกธนูตามอาวุธ (`attack_range` → `max_distance`) / รูปลูกธนู + รูปกระสุนมอน
+- [ ] ดาบ/ธนูครบทุกท่า (ตอนนี้มีแค่ idle + attack บางเฟรม)
+- [ ] ระบบสกิลกลาง (SkillData ใช้ร่วมกันทั้งผู้เล่นและมอน) — ทำหลัง EXP
+- [ ] main scene / หลายแผนที่ — ทำตอนมีแผนที่ที่ 2
 - [ ] หมวก + ตาราง `slot_sprites` (ดู 3.17)
 - [ ] Item pickup (เก็บของจากพื้น) / ไอเทมใช้แล้วหมด (ยา)
 - [ ] Skill system (cooldown, mana cost, effect)
