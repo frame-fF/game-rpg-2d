@@ -8,7 +8,7 @@ class_name SkillSetData
 var cooldowns: Dictionary = {}      # id สกิล -> วินาทีที่เหลือ (ค่าตอนเล่น ไม่เซฟ)
 
 func get_level(skill: SkillData) -> int:
-	return levels.get(skill.id, 1)
+	return clampi(levels.get(skill.id, 1), 1, skill.max_level) # เกิน max_level ไม่ได้
 
 func is_ready(skill: ActiveSkill) -> bool:
 	return cooldowns.get(skill.id, 0.0) <= 0.0

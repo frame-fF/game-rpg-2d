@@ -10,11 +10,14 @@ extends CharacterBody2D
 @export var passives: Array[PassiveSkill] = []
 @export var skill_level: int = 1
 @export var chase_distance: float = 400.0 # เป้าไกลกว่านี้ = เลิกไล่
+@export var follow_distance: float = 60.0 # ลูกน้อง: ห่างเจ้าของเกินนี้ = เดินตาม
 
 var team: String = "monster"
 var effects: EffectHolder
 var skill_cooldowns: Dictionary = {} # id สกิล -> วินาทีที่เหลือ (แยกต่อตัว)
 var pending_skill: ActiveSkill        # สกิลที่จะออกตอนถึงเฟรมโจมตี
+var leader: Node2D                    # เจ้าของ (ถ้าเป็นลูกน้องที่ถูกเสก)
+var lifetime: float = 0.0             # ลูกน้อง: วินาทีที่เหลือ, 0 = อยู่จนตาย
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var direction: float = 1.0
@@ -35,7 +38,7 @@ func _ready() -> void:
 	effects.name = "Effects"
 	add_child(effects)
 	for passive in passives:
-		effects.add(passive.id, passive.skill_name, passive.effects, skill_level, -1.0)
+		effects.add(passive.id, passive.skill_name, passive.effects, mini(skill_level, passive.max_level), -1.0)
 	start_x = position.x
 	attack_box_x = absf(attack_area.position.x)
 	detect_area.body_entered.connect(_on_detect_entered)
@@ -50,13 +53,21 @@ func _physics_process(delta: float) -> void:
 		cooldown_timer -= delta
 	for id in skill_cooldowns:
 		skill_cooldowns[id] = maxf(skill_cooldowns[id] - delta, 0.0)
-	if target and (not is_instance_valid(target) or global_position.distance_to(target.global_position) > chase_distance):
-		target = null
-
-	if is_dead:
+	if is_dead: # ตายแล้ว: ไม่หาเป้า/ไม่นับเวลา (Area ปิดไปแล้ว)
 		velocity.x = 0.0
 		move_and_slide()
 		return
+
+	if target and (not is_instance_valid(target) or target.get("is_dead") \
+			or global_position.distance_to(target.global_position) > chase_distance):
+		target = null
+	if target == null:
+		target = _find_target()
+	if lifetime > 0.0:
+		lifetime -= delta
+		if lifetime <= 0.0:
+			die()
+			return
 
 	if is_attacking:
 		velocity.x = 0.0
@@ -68,6 +79,8 @@ func _physics_process(delta: float) -> void:
 				_start_attack()
 		else:
 			velocity.x = direction * get_stat("move_speed")
+	elif leader and is_instance_valid(leader):
+		_follow_leader()
 	else:
 		_patrol()
 
@@ -91,6 +104,21 @@ func _patrol() -> void:
 		direction = 1.0
 	velocity.x = direction * get_stat("move_speed")
 
+func _follow_leader() -> void:
+	var dx := leader.global_position.x - global_position.x
+	if absf(dx) > follow_distance:
+		direction = signf(dx)
+		velocity.x = direction * get_stat("move_speed")
+	else:
+		velocity.x = 0.0
+
+# ศัตรูตัวแรกที่อยู่ในวงมองเห็น (ใช้ตอนเป้าเดิมตาย/หาย)
+func _find_target() -> Node2D:
+	for body in detect_area.get_overlapping_bodies():
+		if Combat.is_enemy(self, body) and not body.get("is_dead"):
+			return body
+	return null
+
 func _start_attack() -> void:
 	is_attacking = true
 	cooldown_timer = attack_cooldown
@@ -109,7 +137,7 @@ func _on_frame_changed() -> void:
 	if sprite.animation != "attack" or sprite.frame != attack_hit_frame:
 		return
 	if pending_skill:
-		pending_skill.use(self, skill_level)
+		pending_skill.use(self, mini(skill_level, pending_skill.max_level))
 	elif projectile_scene:
 		Combat.shoot(self, projectile_scene, get_attack_power(), get_attack_origin(), direction)
 	else:
@@ -136,7 +164,8 @@ func _on_animation_finished() -> void:
 		queue_free()
 
 func _on_detect_entered(body: Node2D) -> void:
-	target = body
+	if target == null and Combat.is_enemy(self, body):
+		target = body
 
 func _on_detect_exited(body: Node2D) -> void:
 	if body == target:
@@ -154,6 +183,8 @@ func take_damage(amount: int, attacker: Node2D = null) -> void:
 		die()
 
 func die() -> void:
+	if is_dead:
+		return
 	is_dead = true
 	effects.clear()
 	collision_layer = 0 # ตีซ้ำไม่ได้ ลูกธนูทะลุ

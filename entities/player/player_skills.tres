@@ -7,14 +7,16 @@
 [ext_resource type="Resource" path="res://skills/flame_armor.tres" id="5_flame"]
 [ext_resource type="Resource" path="res://skills/iron_skin.tres" id="6_iron"]
 [ext_resource type="Script" path="res://data/passive_skill.gd" id="7_passive"]
+[ext_resource type="Resource" path="res://skills/summon_minion.tres" id="8_summon"]
 
 [resource]
 script = ExtResource("1_script")
-hotbar = Array[ExtResource("2_active")]([ExtResource("3_strike"), ExtResource("4_fire"), ExtResource("5_flame"), null])
+hotbar = Array[ExtResource("2_active")]([ExtResource("3_strike"), ExtResource("4_fire"), ExtResource("5_flame"), ExtResource("8_summon")])
 passives = Array[ExtResource("7_passive")]([ExtResource("6_iron")])
 levels = {
 "fireball": 1,
 "flame_armor": 1,
 "iron_skin": 1,
-"power_strike": 2
+"power_strike": 2,
+"summon_minion": 1
 }

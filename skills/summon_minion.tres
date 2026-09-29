@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SummonSkill" format=3]
+
+[ext_resource type="Script" uid="uid://rocb1e6pb3id" path="res://data/summon_skill.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://entities/monsters/monster.tscn" id="2_minion"]
+
+[resource]
+script = ExtResource("1_script")
+id = "summon_minion"
+skill_name = "เรียกลูกน้อง"
+description = "เรียกมอนลิ้นมาช่วยสู้"
+max_level = 5
+cooldown = 8.0
+mp_cost = Array[int]([0])
+animation = "attack"
+skill_range = 9999.0
+monster_scene = ExtResource("2_minion")
+count = Array[int]([1, 1, 2])
+max_alive = Array[int]([2, 3])
+spread = 40.0
