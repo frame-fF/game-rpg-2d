@@ -55,7 +55,14 @@ data/                          ← สคริปต์แม่แบบ Resou
 ├── equipment_data.gd          ← แม่ของไอเทมทุกชนิด
 ├── weapon_data.gd, armor_data.gd  ← ลูก (extends EquipmentData)
 ├── appearance_data.gd
-└── inventory_data.gd
+├── inventory_data.gd
+├── combat.gd                  ← โค้ดตีกลาง + กฎฝ่าย (team) — class Combat (static)
+├── skill_data.gd → active_skill.gd → attack_skill.gd / buff_skill.gd / summon_skill.gd
+├── passive_skill.gd           ← extends SkillData
+├── skill_set_data.gd          ← สกิลของตัวละคร: ช่อง 1-4, Passive, เลเวล, cooldown
+└── effect_data.gd → stat_effect.gd / aura_effect.gd
+skills/                        ← ไฟล์สกิลกลาง (.tres) ผู้เล่น/มอน/ลูกน้องใช้ร่วมกัน
+                                  power_strike, fireball, flame_armor, iron_skin, summon_minion (ตัวอย่างทั้งหมด)
 items/                         ← ข้อมูลไอเทมจริง (.tres) = ตัวไอเทม + SpriteFrames แยกเพศ
 ├── armor/   armor_1_m.tres (ล็อก male), armor_1_f.tres (ล็อก female), armor_1_frames_m/f.tres
 ├── weapons/
@@ -65,6 +72,7 @@ items/                         ← ข้อมูลไอเทมจริง
 entities/player/
 ├── player.tscn, player.gd
 ├── player_stats.tres, player_inventory.tres, player_appearance.tres
+├── player_skills.tres         ← SkillSetData ของผู้เล่น
 ├── body_frames_m.tres, body_frames_f.tres   ← SpriteFrames ตัวละครแยกเพศ
 └── sprites/
     ├── base_body/m/, base_body/f/   ← เฟรมตัว (idle_0, walk_3, ...)
@@ -76,8 +84,9 @@ entities/monsters/
 ├── 1/  sprites/, frames.tres, stats.tres               ← มอนตีประชิด (ลิ้น)
 └── 2/  sprites/, frames.tres, stats.tres, monster_2.tscn (Inherited)  ← มอนตีไกล (ผี)
 entities/dummy/                ← dummy.tscn, dummy.gd, dummy_stats.tres (แม่แบบ)
-entities/projectiles/          ← projectile.gd, arrow.tscn (ผู้เล่น), enemy_orb.tscn (มอน)
-ui/hud/, ui/inventory/
+entities/common/effect_holder.gd ← ตัวเก็บ Effect ที่ทำงานอยู่ (ผู้เล่น/มอนมีคนละก้อน)
+entities/projectiles/          ← projectile.gd + arrow.tscn, enemy_orb.tscn, fireball.tscn (ทุกลูกกรองด้วย team)
+ui/hud/ (HP, MP, รายการบัพ), ui/inventory/, ui/hotbar/ (ช่องสกิล 1-4)
 levels/village.tscn            ← ด่านทดสอบ
 ```
 นอกโปรเจกต์: `Desktop\assets\` = ต้นฉบับ ห้ามแก้ / `Desktop\Game Assets\` = รูปที่เปลี่ยนชื่อ + จัด canvas แล้ว (มี `note.txt` บอกเลขเฟรมต้นฉบับ) ก่อนก๊อปเข้าเกม (ดู 3.22)
@@ -860,6 +869,54 @@ HotbarData               ช่อง 1-4 ใส่ ActiveSkill อะไร (�
 | 5 | JobData + หน้าต่างรายการสกิล ลากใส่ช่องได้ | กลาง-ยาก |
 | 6 | ระบบฝ่าย → ผู้เล่นเสกมอนช่วยสู้ | ยาก |
 
+> ทำจริงแล้ว: ช่วง 1, 2, 3 และแกนของช่วง 6 (ลูกน้องผู้เล่นช่วยสู้) — ดู 3.26 / ช่วง 4-5 ยังไม่ทำ (ต้องมี EXP ก่อน)
+
+### 3.26 ระบบสกิลที่ทำจริง (ช่วง 1-3 + ลูกน้องผู้เล่น)
+**สถานะ:** ระบบใช้ของจริงได้ / **สกิลทั้ง 5 ตัวเป็นตัวอย่าง** ไว้ทดสอบ (ชื่อ/ตัวเลข/กระสุนวงกลมสีเป็นของชั่วคราว)
+**สร้างสกิลใหม่ไม่ต้องเขียนโค้ด:** FileSystem → คลิกขวา `skills/` → New Resource → AttackSkill / BuffSkill / SummonSkill / PassiveSkill → ตั้งค่า → ลากใส่ `player_skills.tres` (ช่อง Hotbar / Passives) หรือช่อง Skills / Passives ของมอน
+
+**โค้ดตีกลาง `data/combat.gd` + ฝ่าย (`team`)**
+- ทุกการตี (ต่อย ดาบ ธนู ลิ้นมอน กระสุน สกิล ออร่า) ผ่าน `Combat.hit_bodies / hit_box / hit_circle / shoot` ที่เดียว
+- `is_enemy(a, b)` = คนละ `team` (ของที่ไม่มี team เช่น Dummy = ศัตรูทุกฝ่าย) → เพิ่มฝ่ายใหม่ ไม่ต้องไล่แก้ collision mask
+- กระสุนมี `team` ของคนยิง ทะลุฝ่ายเดียวกัน → mask กระสุนทุกลูก = 7 (world+player+monster) ลูกเดียวใช้ได้ทั้ง 2 ฝ่าย
+- `take_damage(amount, attacker)` ส่งคนตีไปด้วย → **มอนโดนตีแล้วไล่คนตี** แม้อยู่นอกระยะมองเห็น, เลิกไล่เมื่อไกลเกิน `chase_distance` (400)
+- อาวุธ: `attack_range` ของธนู = ระยะลูกธนู (0 = ใช้ระยะของกระสุน)
+- ผู้เล่นกับมอนมีฟังก์ชันชื่อเดียวกัน `get_attack_power()` / `get_facing()` / `get_attack_origin()` / `get_stat()` → สกิลเรียกได้โดยไม่ต้องรู้ว่าใครใช้
+
+**สกิลกดใช้ (ช่วง 1)**
+- `ActiveSkill`: cooldown, MP ตามเลเวล, ท่า (`attack`/`shoot`), `skill_range`, `use(ผู้ใช้, เลเวล)`
+- `AttackSkill`: ดาเมจ = พลังโจมตี × `damage_multiplier[เลเวล]`, ประชิด (`Combat.hit_box` กล่องยาว `skill_range`) หรือยิง (`projectile_scene`)
+- ผู้เล่น: ปุ่ม `skill_1`-`skill_4` (เลข 1-4 **Physical Keycode**) → เช็ค cooldown + MP → เล่นท่า → `skill.use()`
+- MP ฟื้นเอง (`mp_regen` ต่อวินาที), `StatsData.mp` มี setter `emit_changed()` → แถบ MP บน HUD
+- `SkillSetData` (ต่อตัวละคร): `hotbar`, `passives`, `levels` (id → เลเวล), `cooldowns` (ค่าตอนเล่น)
+- มอน: `skills` (รายการ) + `skill_level` + `skill_cooldowns` ของตัวเอง → ตอนเข้าระยะตี ใช้สกิลแรกที่พร้อม+อยู่ในระยะ ไม่งั้นตีธรรมดา / สกิลออกตอนถึง `attack_hit_frame`
+- ช่องสกิล `ui/hotbar/`: สร้าง UI ด้วยโค้ด อ่านจาก `SkillSetData` อย่างเดียว (ชื่อสกิลถ้ายังไม่มีไอคอน + เลขวินาที cooldown)
+
+**เลเวลสกิล**
+- `max_level` ต่อสกิล (บางอัน 20 บางอัน 5) + `get_level()` ตัดไม่ให้เกิน
+- ค่าตามเลเวล `SkillData.pick(values, level)`: รายการสั้นกว่าเลเวล = โตต่อด้วยส่วนต่าง 2 ตัวท้าย (`[1.5, 1.6]` → Lv20 = 3.4) / ตัวเดียว = คงที่ / รายการเต็ม = กระโดดตามต้องการ
+
+**ระบบ stat กลาง + Effect / Buff / Passive (ช่วง 2)**
+```gdscript
+# player.gd (มอนมีแบบเดียวกันแต่ไม่มีชุด)
+func get_stat(stat: String) -> float:
+	var value: float = stats.get(stat) + inventory.get_flat_bonus(stat) + effects.stat_flat(stat)
+	return maxf(value * inventory.get_multiplier(stat) * (1.0 + effects.stat_percent(stat) / 100.0), 0.0)
+```
+- ทุกจุดที่เคยอ่าน `stats.xxx` ตรงๆ (7 จุด) เปลี่ยนเป็น `get_stat()` / defense ลดดาเมจทั้งผู้เล่นและมอน (มอนตั้ง defense 0 ให้ balance เท่าเดิม)
+- `EffectData` (Resource, ค่าคงที่) → `StatEffect` (เพิ่ม/ลด stat, `add` หรือ `percent`, ค่าติดลบ = ลด) / `AuraEffect` (ดาเมจรอบตัวทุก X วิ + วงกลมแสดงผล)
+- `EffectHolder` (Node ลูกของตัวละคร สร้างด้วยโค้ดใน `_ready`): เก็บ Effect ที่ทำงานอยู่ + ตัวจับเวลา + state ต่อชิ้น (ค่าตอนเล่นไม่เก็บใน .tres)
+- `BuffSkill` = ระยะเวลา + รายการ Effect / **กดซ้ำ = ต่อเวลา ไม่ซ้อน** / `PassiveSkill` = Effect ถาวร (duration -1) ใส่ตอนเริ่มเกม
+- ตัวอย่าง: เกราะเพลิง (def +10, atk −5, ออร่า 5/วิ รัศมี 60, 10 วิ) / ผิวหนังเหล็ก (def +3 ถาวร)
+- HUD แสดงรายการบัพ + วินาทีที่เหลือ (`effects_owner` ชี้ Player)
+
+**สกิลเสก + ลูกน้อง (ช่วง 3 + แกนช่วง 6)**
+- `SummonSkill`: `monster_scene`, `count`, `max_alive` (เพดานลูกน้องที่ยังไม่ตาย ต่อคนเสก ผ่าน group `summons_<id>`), `spread`, `lifetime` (**0 = อยู่จนตาย**, >0 = ครบเวลาเล่นท่าตาย)
+- ลูกน้อง = มอนธรรมดา: `team` = ของคนเสก, `leader` = คนเสก, ไม่มีเป้า → **เดินตามเจ้าของ** (`follow_distance` 60)
+- มอนเลือกเป้าเฉพาะศัตรู: DetectArea mask = player + monster แล้วกรองด้วย `Combat.is_enemy` / เป้าตายแล้วหาตัวใหม่ในวงเอง → ลูกน้องผู้เล่นไล่มอน, มอนก็ไล่ลูกน้องได้
+- ลูกน้องใส่สกิล/Passive ได้เหมือนมอน (Inherited Scene จาก monster.tscn แล้วตั้ง Skills / Passives / Skill Level)
+- ยังไม่มี: เลเวลสกิลเสก → เลเวลลูกน้อง, สกิลช่วยพวกเดียวกัน (ฮีล/บัพให้คนอื่น), แถบเลือดลูกน้อง, รูปลูกน้องแยกจากมอนศัตรู
+
 ---
 
 ## 4. Input Actions ที่ใช้
@@ -935,6 +992,21 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 ### 5.17 เครื่องมือแก้ไฟล์ติด "classifier gave no verdict" ใน Auto mode
 ตัวตรวจความปลอดภัยของโหมด Auto ล่ม → แก้ไฟล์ไม่ได้เลยแม้บรรทัดเดียว → กด Shift+Tab เปลี่ยนเป็น **Edit automatically** หรือ **Manual** ชั่วคราว
 
+### 5.18 ช่อง export ชนิด Node ใน .tscn ไม่ทำงาน (HUD ไม่แสดงบัพ)
+`@export var effects_owner: Node` แล้วเขียน `effects_owner = NodePath("../Player")` ในไฟล์ .tscn เอง → ได้ `null` เพราะต้องประกาศในหัว node ด้วย: `[node name="Hud" ... node_paths=PackedStringArray("effects_owner") ...]` (ตั้งผ่าน Inspector Godot ใส่ให้เอง)
+
+### 5.19 มอนตายแล้ว error ~30 บรรทัด "Can't find overlapping bodies when monitoring is off"
+ตอนตายปิด DetectArea (`monitoring = false`) แต่ระหว่างเล่นท่าตาย `_physics_process` ยังเรียก `get_overlapping_bodies()` หาเป้าใหม่ทุกเฟรม → ย้ายเช็ค `is_dead` (return) ขึ้นไปก่อนส่วนหาเป้า / **บทเรียน:** ของที่ถูกปิดตอนตาย ต้องไม่ถูกใช้ต่อหลังตาย
+
+### 5.20 ใส่รายการธรรมดาให้ช่อง `Array[float]` ไม่ได้
+`skill.lifetime = [3.0]` → error "Invalid assignment ... Array" เพราะช่องเป็น typed array → ใช้ `skill.lifetime.assign([3.0])` (ใน .tres เขียน `Array[float]([3.0])`)
+
+### 5.21 คลาสใหม่ยังไม่ถูกลงทะเบียน → parse error ปลอม
+เขียน `class_name` ใหม่แล้วสคริปต์อื่นใช้ทันที ก่อน Godot scan → "Could not find type ..." / "Cannot infer the type" → สั่ง scan (หรือโฟกัสหน้าต่าง Godot) แล้ว error หาย / error เก่าอาจค้างในแท็บ Debugger ให้ดูจากการรันเกมจริงแทน
+
+### 5.22 ผูกปุ่มเลขด้วยเครื่องมือได้ keycode ธรรมดา → เปิดภาษาไทยกดไม่ติด
+MCP `input_map_manage bind_event` ผูกแบบตัวอักษร (keycode) → ปุ่ม 1 ตอนภาษาไทยเป็น "ๅ" → แก้ `project.godot` ให้เป็น `physical_keycode` แล้ว **Project → Reload Current Project** (editor จำค่าเก่าในหน่วยความจำ)
+
 ---
 
 ## 6. เช็คลิสต์ก่อนบอกว่า "เสร็จแล้ว" (ทำทุกครั้งหลังแก้ `.tscn`/`.gd`)
@@ -964,15 +1036,18 @@ Godot สร้างไฟล์ `.uid` คู่กับทุก `.gd` อ�
 - [x] ท่าโจมตีตามอาวุธ (`attack_animation`, ท่า `shoot`) + ธนู bow_1 (3.21)
 - [x] มอนสเตอร์: เดินไปมา / เห็นแล้วไล่ / ตี / ท่าตาย + ผู้เล่นโดนตี (defense) (3.23)
 - [x] มอนตีไกล (`projectile_scene`) + Inherited Scene (3.24)
-- [ ] มอนโดนตีแล้วไล่คนตี (`take_damage(amount, attacker)`)
-- [ ] EXP ตอนฆ่ามอน + เลเวลอัป / มอนคิด defense
+- [x] มอนโดนตีแล้วไล่คนตี (`take_damage(amount, attacker)`) + มอนคิด defense (3.26)
+- [x] ระยะลูกธนูตามอาวุธ (`attack_range`) (3.26)
+- [x] ระบบสกิล ช่วง 1-3: Combat กลาง + team, AttackSkill, ช่อง 1-4, MP, เลเวลสกิล (max_level + โตต่อเอง), stat กลาง, Effect / Buff / Passive, SummonSkill (3.26)
+- [x] ลูกน้องของผู้เล่นช่วยสู้ + ตามเจ้าของ + `lifetime` (0 = อยู่จนตาย) (3.26)
+- [ ] **ถัดไป:** EXP ตอนฆ่ามอน (ลูกน้องฆ่า → EXP เข้าเจ้าของ) + เลเวลอัป + แถบ EXP + แต้มสกิล
+- [ ] ระบบสกิล ช่วง 4-5: อัปเลเวลสกิลด้วยแต้ม, อาชีพ (JobData), หน้าต่างสกิลลากใส่ช่อง
+- [ ] เลเวลสกิลเสก → เลเวลลูกน้อง / สกิลช่วยพวกเดียวกัน (ฮีล/บัพคนอื่น) / แถบเลือดลูกน้อง
 - [ ] ผู้เล่นตาย → เกิดใหม่ / มอนเกิดใหม่ (MonsterSpawner)
-- [ ] ระยะลูกธนูตามอาวุธ (`attack_range` → `max_distance`) / รูปลูกธนู + รูปกระสุนมอน
+- [ ] รูปลูกธนู + รูปกระสุนมอน/ลูกไฟ + ไอคอนสกิล
 - [ ] ดาบ/ธนูครบทุกท่า (ตอนนี้มีแค่ idle + attack บางเฟรม)
-- [ ] ระบบสกิล — ออกแบบแล้ว แผน 6 ช่วง ดู 3.25 (ช่วง 1-3 ทำได้เลย, ช่วง 4 ขึ้นไปต้องมี EXP ก่อน)
 - [ ] main scene / หลายแผนที่ — ทำตอนมีแผนที่ที่ 2
 - [ ] หมวก + ตาราง `slot_sprites` (ดู 3.17)
 - [ ] Item pickup (เก็บของจากพื้น) / ไอเทมใช้แล้วหมด (ยา)
-- [ ] Skill system (cooldown, mana cost, effect)
 - [ ] Save/Load ตัวละคร (local ก่อน)
 - [ ] ค่อยไปแตะ network/multiplayer (Phase 3-4)

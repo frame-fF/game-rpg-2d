@@ -206,8 +206,7 @@ u16 w @0x0F, u16 h @0x11, u32 w*h @0x17, pixels @27
 
 ## 7. สคริปต์แปลง
 
-อยู่ใน scratchpad ของ session (ชั่วคราว — **ถ้าจะใช้ซ้ำให้ย้ายมาเก็บใน `tools/ghost_extract/`**):
-`C:\Users\fF\AppData\Local\Temp\claude\c--Users-fF-Desktop-game-rpg-2d\96bf33d1-796b-4da3-a131-dcb0bbc2a937\scratchpad\`
+อยู่ที่ `C:\Users\fF\Desktop\Ghost Assets\_tools\` (+ `build_index.py` สร้าง `_item_index.json`) — คู่มือเต็มสำหรับโปรเจกต์ใหม่ดู [GHOST_ASSEST_GUILD.md](GHOST_ASSEST_GUILD.md)
 
 | สคริปต์ | หน้าที่ |
 |---|---|
