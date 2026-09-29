@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ArmorData" format=3]
+
+[ext_resource type="Texture2D" uid="uid://y0uk0hxftxid" path="res://entities/player/sprites/armor/1/icon.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://dpwh2u28wj1s8" path="res://data/armor_data.gd" id="2_script"]
+[ext_resource type="SpriteFrames" path="res://items/armor/armor_1_frames_f.tres" id="3_female"]
+
+[resource]
+script = ExtResource("2_script")
+item_name = "armor_1_f"
+icon = ExtResource("1_icon")
+slot = "armor"
+sprite_frames_female = ExtResource("3_female")
+gender_lock = "female"
+metadata/_custom_type_script = "uid://dsnryq0h70574"
