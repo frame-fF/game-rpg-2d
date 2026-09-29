@@ -6,6 +6,13 @@ extends CharacterBody2D
 @export var attack_cooldown: float = 1.5
 @export var attack_hit_frame: int = 1 # เฟรมของท่า attack ที่ดาเมจเข้า
 @export var projectile_scene: PackedScene # ใส่ = ตีไกล (ยิงจากตำแหน่ง AttackArea), ว่าง = ตีประชิด
+@export var skills: Array[ActiveSkill] = [] # สกิลเสริม ใช้เมื่อ cooldown หมดและเป้าอยู่ในระยะสกิล
+@export var skill_level: int = 1
+@export var chase_distance: float = 400.0 # เป้าไกลกว่านี้ = เลิกไล่
+
+var team: String = "monster"
+var skill_cooldowns: Dictionary = {} # id สกิล -> วินาทีที่เหลือ (แยกต่อตัว)
+var pending_skill: ActiveSkill        # สกิลที่จะออกตอนถึงเฟรมโจมตี
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var direction: float = 1.0
@@ -34,6 +41,10 @@ func _physics_process(delta: float) -> void:
 		velocity.y += gravity * delta
 	if cooldown_timer > 0.0:
 		cooldown_timer -= delta
+	for id in skill_cooldowns:
+		skill_cooldowns[id] = maxf(skill_cooldowns[id] - delta, 0.0)
+	if target and (not is_instance_valid(target) or global_position.distance_to(target.global_position) > chase_distance):
+		target = null
 
 	if is_dead:
 		velocity.x = 0.0
@@ -76,24 +87,36 @@ func _patrol() -> void:
 func _start_attack() -> void:
 	is_attacking = true
 	cooldown_timer = attack_cooldown
+	pending_skill = _pick_skill()
+	if pending_skill:
+		skill_cooldowns[pending_skill.id] = pending_skill.cooldown
+
+func _pick_skill() -> ActiveSkill:
+	var dist := absf(target.global_position.x - global_position.x)
+	for skill in skills:
+		if skill_cooldowns.get(skill.id, 0.0) <= 0.0 and dist <= skill.skill_range:
+			return skill
+	return null
 
 func _on_frame_changed() -> void:
 	if sprite.animation != "attack" or sprite.frame != attack_hit_frame:
 		return
-	if projectile_scene:
-		_shoot()
-		return
-	for body in attack_area.get_overlapping_bodies():
-		if body.has_method("take_damage"):
-			body.take_damage(stats.attack_power)
+	if pending_skill:
+		pending_skill.use(self, skill_level)
+	elif projectile_scene:
+		Combat.shoot(self, projectile_scene, get_attack_power(), get_attack_origin(), direction)
+	else:
+		Combat.hit_bodies(self, attack_area.get_overlapping_bodies(), get_attack_power())
 
-func _shoot() -> void:
-	var projectile := projectile_scene.instantiate() as Projectile
-	projectile.direction = direction
-	projectile.damage = stats.attack_power
-	projectile.shooter = self
-	projectile.position = position + attack_area.position
-	get_parent().add_child(projectile)
+# ที่สกิลเรียกใช้ (ผู้เล่นมีฟังก์ชันชื่อเดียวกัน)
+func get_attack_power() -> int:
+	return stats.attack_power
+
+func get_facing() -> float:
+	return direction
+
+func get_attack_origin() -> Vector2:
+	return position + attack_area.position
 
 func _on_animation_finished() -> void:
 	if sprite.animation == "attack":
@@ -108,9 +131,11 @@ func _on_detect_exited(body: Node2D) -> void:
 	if body == target:
 		target = null
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, attacker: Node2D = null) -> void:
 	if is_dead:
 		return
+	if attacker and Combat.is_enemy(self, attacker):
+		target = attacker # โดนตีแล้วไล่คนตี แม้อยู่นอกระยะมองเห็น
 	stats.hp -= amount
 	print("Monster took ", amount, " damage. HP: ", stats.hp, "/", stats.max_hp)
 	if stats.hp <= 0:

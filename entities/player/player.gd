@@ -27,6 +27,11 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var body_frames_female: SpriteFrames
 
 @export var inventory: InventoryData
+@export var skills: SkillSetData
+@export var mp_regen: float = 2.0 # MP ต่อวินาที
+
+var team: String = "player"
+var _mp_regen_acc: float = 0.0
 
 func _ready() -> void:
 	inventory.equipment_changed.connect(_on_equipment_changed)
@@ -41,6 +46,8 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= _delta
+	skills.tick(_delta)
+	_regen_mp(_delta)
 
 	if not is_on_floor():
 		velocity.y += gravity * _delta
@@ -61,6 +68,9 @@ func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("attack") and not is_attacking:
 		is_attacking = true
 		_attack()
+	for slot in 4:
+		if Input.is_action_just_pressed("skill_%d" % (slot + 1)):
+			_use_skill(slot)
 
 	if is_dashing:
 		velocity.x = facing_direction * dash_speed
@@ -91,18 +101,50 @@ func _physics_process(_delta: float) -> void:
 
 
 func _attack() -> void:
-	var damage := stats.attack_power + inventory.get_attack_power_bonus()
+	var damage := get_attack_power()
 	var weapon := inventory.equipped.get("weapon") as WeaponData
 	attack_anim = weapon.attack_animation if weapon else "attack"
 	if weapon and weapon.attack_type == "projectile":
-		_shoot(weapon.projectile_scene, damage)
+		Combat.shoot(self, weapon.projectile_scene, damage, get_attack_origin(), facing_direction, weapon.attack_range)
 		return
-	for body in attack_area.get_overlapping_bodies():
-		if body.has_method("take_damage"):
-			body.take_damage(damage)
+	Combat.hit_bodies(self, attack_area.get_overlapping_bodies(), damage)
+
+func _use_skill(slot: int) -> void:
+	var skill: ActiveSkill = skills.hotbar[slot] if slot < skills.hotbar.size() else null
+	if skill == null or is_attacking or not skills.is_ready(skill):
+		return
+	var level := skills.get_level(skill)
+	var cost := skill.get_mp_cost(level)
+	if stats.mp < cost:
+		print("MP ไม่พอ: ", skill.skill_name)
+		return
+	stats.mp -= cost
+	skills.start_cooldown(skill)
+	is_attacking = true
+	attack_anim = skill.animation
+	skill.use(self, level)
+
+func _regen_mp(delta: float) -> void:
+	if stats.mp >= stats.max_mp:
+		_mp_regen_acc = 0.0
+		return
+	_mp_regen_acc += mp_regen * delta
+	if _mp_regen_acc >= 1.0:
+		stats.mp = mini(stats.mp + int(_mp_regen_acc), stats.max_mp)
+		_mp_regen_acc -= int(_mp_regen_acc)
+
+# ที่สกิลเรียกใช้ (มอนมีฟังก์ชันชื่อเดียวกัน)
+func get_attack_power() -> int:
+	return stats.attack_power + inventory.get_attack_power_bonus()
+
+func get_facing() -> float:
+	return facing_direction
+
+func get_attack_origin() -> Vector2:
+	return position + Vector2(ATTACK_START * facing_direction, -10)
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, _attacker: Node2D = null) -> void:
 	var damage := maxi(1, amount - (stats.defense + inventory.get_defense_bonus()))
 	stats.hp = maxi(stats.hp - damage, 0)
 	print("Player took ", damage, " damage. HP: ", stats.hp, "/", stats.max_hp)
@@ -146,14 +188,6 @@ func _sync_layer(layer: AnimatedSprite2D) -> void:
 func _set_attack_range(value: float) -> void:
 	attack_range = value
 	attack_shape.shape.size.x = value
-
-func _shoot(scene: PackedScene, damage: int) -> void:
-	var projectile := scene.instantiate() as Projectile
-	projectile.direction = facing_direction
-	projectile.damage = damage
-	projectile.shooter = self
-	projectile.position = position + Vector2(ATTACK_START * facing_direction, -10)
-	get_parent().add_child(projectile)
 
 func _on_animation_finished() -> void:
 	if animated_sprite.animation == attack_anim:

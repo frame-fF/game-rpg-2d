@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AttackSkill" format=3]
+
+[ext_resource type="Script" uid="uid://bpohik77cj5t7" path="res://data/attack_skill.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://entities/projectiles/fireball.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_script")
+id = "fireball"
+skill_name = "ลูกไฟ"
+description = "ยิงลูกไฟไปข้างหน้า"
+max_level = 3
+cooldown = 2.0
+mp_cost = Array[int]([8, 10, 12])
+animation = "shoot"
+skill_range = 350.0
+damage_multiplier = Array[float]([1.5, 2.0, 2.5])
+projectile_scene = ExtResource("2_proj")

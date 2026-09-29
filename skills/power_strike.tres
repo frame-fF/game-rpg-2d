@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackSkill" format=3]
+
+[ext_resource type="Script" uid="uid://bpohik77cj5t7" path="res://data/attack_skill.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "power_strike"
+skill_name = "ฟันแรง"
+description = "ฟันไปข้างหน้าแรงกว่าปกติ"
+max_level = 3
+cooldown = 1.5
+mp_cost = Array[int]([5, 7, 10])
+animation = "attack"
+skill_range = 60.0
+damage_multiplier = Array[float]([2.0, 2.5, 3.0])

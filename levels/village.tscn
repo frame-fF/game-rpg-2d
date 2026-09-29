@@ -10,6 +10,8 @@
 [ext_resource type="Resource" uid="uid://c3ni3jtbrusd3" path="res://entities/player/player_appearance.tres" id="8_c8dkm"]
 [ext_resource type="PackedScene" path="res://entities/monsters/monster.tscn" id="9_monster"]
 [ext_resource type="PackedScene" path="res://entities/monsters/2/monster_2.tscn" id="10_monster2"]
+[ext_resource type="PackedScene" path="res://ui/hotbar/hotbar.tscn" id="11_hotbar"]
+[ext_resource type="Resource" path="res://entities/player/player_skills.tres" id="12_skills"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
 size = Vector2(2000, 20)
@@ -52,3 +54,6 @@ position = Vector2(-500, -70)
 
 [node name="Monster2" parent="." instance=ExtResource("10_monster2")]
 position = Vector2(700, -60)
+
+[node name="Hotbar" parent="." instance=ExtResource("11_hotbar")]
+skills = ExtResource("12_skills")

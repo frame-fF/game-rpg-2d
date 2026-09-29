@@ -4,6 +4,8 @@
 [ext_resource type="SpriteFrames" path="res://entities/monsters/2/frames.tres" id="2_frames"]
 [ext_resource type="Resource" path="res://entities/monsters/2/stats.tres" id="3_stats"]
 [ext_resource type="PackedScene" path="res://entities/projectiles/enemy_orb.tscn" id="4_orb"]
+[ext_resource type="Resource" path="res://skills/fireball.tres" id="5_fire"]
+[ext_resource type="Script" path="res://data/active_skill.gd" id="6_active"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body2"]
 size = Vector2(40, 60)
@@ -17,6 +19,7 @@ attack_range = 180.0
 attack_cooldown = 2.0
 attack_hit_frame = 2
 projectile_scene = ExtResource("4_orb")
+skills = Array[ExtResource("6_active")]([ExtResource("5_fire")])
 
 [node name="AnimatedSprite2D" parent="." index="0"]
 sprite_frames = ExtResource("2_frames")

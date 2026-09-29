@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillSetData" format=3]
+
+[ext_resource type="Script" uid="uid://cjsabucbu5n6t" path="res://data/skill_set_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://data/active_skill.gd" id="2_active"]
+[ext_resource type="Resource" path="res://skills/power_strike.tres" id="3_strike"]
+[ext_resource type="Resource" path="res://skills/fireball.tres" id="4_fire"]
+
+[resource]
+script = ExtResource("1_script")
+hotbar = Array[ExtResource("2_active")]([ExtResource("3_strike"), ExtResource("4_fire"), null, null])
+levels = {
+"fireball": 1,
+"power_strike": 2
+}

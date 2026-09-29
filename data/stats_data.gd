@@ -15,7 +15,10 @@ class_name StatsData
 @export var resistance: int = 0
 
 @export var max_mp: int = 50
-@export var mp: int = 50
+@export var mp: int = 50:
+	set(value):
+		mp = value
+		emit_changed()
 
 @export var attack_power: int = 10
 @export var attack_speed: float = 1.0

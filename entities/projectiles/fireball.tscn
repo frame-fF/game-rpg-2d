@@ -2,19 +2,19 @@
 
 [ext_resource type="Script" uid="uid://ddgafa4i6ih7i" path="res://entities/projectiles/projectile.gd" id="1_script"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_orb"]
-radius = 4.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_fire"]
+radius = 6.0
 
-[node name="EnemyOrb" type="Area2D"]
+[node name="Fireball" type="Area2D"]
 collision_layer = 0
 collision_mask = 7
 script = ExtResource("1_script")
-speed = 220.0
-max_distance = 260.0
+speed = 320.0
+max_distance = 350.0
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
-color = Color(0.55, 0.2, 0.75, 1)
-polygon = PackedVector2Array(-4, -2, -2, -4, 2, -4, 4, -2, 4, 2, 2, 4, -2, 4, -4, 2)
+color = Color(1, 0.45, 0.1, 1)
+polygon = PackedVector2Array(-6, -3, -3, -6, 3, -6, 6, -3, 6, 3, 3, 6, -3, 6, -6, 3)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_orb")
+shape = SubResource("CircleShape2D_fire")

@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://50dekp51o0oq" path="res://entities/player/player_inventory.tres" id="5_50fht"]
 [ext_resource type="SpriteFrames" uid="uid://dmvc4flteab5r" path="res://entities/player/body_frames_m.tres" id="6_body"]
 [ext_resource type="SpriteFrames" uid="uid://02smevmufg0g" path="res://entities/player/body_frames_f.tres" id="7_body_f"]
+[ext_resource type="Resource" path="res://entities/player/player_skills.tres" id="8_skills"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yqrof"]
 size = Vector2(41, 82)
@@ -21,6 +22,7 @@ appearance = ExtResource("3_ghoj8")
 body_frames_male = ExtResource("6_body")
 body_frames_female = ExtResource("7_body_f")
 inventory = ExtResource("5_50fht")
+skills = ExtResource("8_skills")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1652129086]
 sprite_frames = ExtResource("6_body")
