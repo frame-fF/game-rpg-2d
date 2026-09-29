@@ -49,6 +49,7 @@
 | `_item_index.json` | item ID → โฟลเดอร์ (ดูหัวข้อ 4) | ฐานข้อมูลไอเทม |
 | `_items.json` | **ไอเทม 11,792 ชิ้น: ชื่อ + สเตตัส + ราคา + ไอคอน + ชิ้นที่ใส่** รวมไว้ในไฟล์เดียว (ดูหัวข้อ 4.1) | ฐานข้อมูลไอเทมพร้อมใช้ |
 | `_tables/` | ตารางข้อมูลเกม 93 ตาราง เป็น `.csv` (เปิดใน Excel ได้) + `.json` (ดูหัวข้อ 12.5) | สกิล เควส NPC ร้านค้า คราฟต์ แผนที่ ข้อความ |
+| `_tables_extra/` | ตารางเสริม: สกิล 577 ตัว (ชื่ออังกฤษ + ค่าทุกเลเวล), เงื่อนไขเควส 2,003 เควส, รายชื่อมอน 551 ตัว (ดูหัวข้อ 12.5.1) | สกิล เควส |
 | `_stages/` | **ด่าน 1,297 ด่าน**: พื้น ประตูวาร์ป จุดเกิด วัตถุที่วาง ชั้น parallax (ดูหัวข้อ 11.5) | ทำด่าน |
 | `_scripts/` | **สคริปต์ NPC 934 ไฟล์ + บทพูด 42,515 บรรทัด** (ดูหัวข้อ 12.6) | บทสนทนา เควส |
 | `_tools/` | สคริปต์ Python ที่ใช้แกะไฟล์ + รูปตัวอย่าง `paperdoll.png` | แกะใหม่ / ตรวจผล |
@@ -664,6 +665,38 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 
 **ความหมายคอลัมน์ที่ยังไม่ชัวร์:** ค่า enum (`eJob`, `nType`, `nSlotPosition`, `nAttribute` ฯลฯ) เป็นตัวเลข ไม่มีตารางบอกความหมาย ต้องเดาจากข้อมูล เช่น ใน `tb_Item` ชุดมี `nSlotPosition = 1`, ผ้าคลุม = 4, ยันต์ = 17 และ `nSex`: 1 = ชาย
 
+### 12.5.1 ตารางเสริม (`_tables_extra/`) — แยกไว้เพราะอาจซ้ำกับ `_tables/`
+
+| ไฟล์ | มาจาก | เนื้อหา | ซ้ำกับ |
+|---|---|---|---|
+| `mob_list` | `zThailand/table/mob.mdd` | รหัสมอนสเตอร์ 551 ตัว (เช่น `1000301`, `1001201`) | — (`tb_Mob` ว่าง) |
+| `skill` | `zThailand/table/skill.skl` | **สกิล 577 ตัว ชื่อภาษาอังกฤษ + คำอธิบาย + ค่าทุกเลเวล** (สูงสุด 40 เลเวล) | `tb_skill` (ชื่อไทย) + `tb_skilllevel` |
+| `skillcnt` | `zThailand/table/skillcnt.cnt` | 825 คู่ `(id, value)` ยังไม่รู้ความหมาย (id 1–10, 101–110 … value 0–6) | — |
+| `qt` | `zThailand/script/qt.tab` | **เงื่อนไขเควส 2,003 เควส**: ฆ่ามอน (436 เควส), เก็บของ (762), คุยกับ NPC (216), ของรางวัล (563) | `tb_listquest` (มีบทพูด/รางวัล แต่ไม่มีเงื่อนไข) |
+
+ทุกไฟล์มีทั้ง `.json` (ข้อมูลเต็ม) และ `.csv` (สรุป เปิด Excel ได้)
+
+**`skill.json`:**
+```json
+{"id": 6, "name": "EnergyBlast",
+ "attributes": [{"attr_id": 12, "per_level": [230, 320, 415, 520, 640, 775, 925, 1100, 1300, 1600]},
+                {"attr_id": 13, "per_level": [230, 320, ...]},
+                {"attr_id": 15, "per_level": [2, 2, 2, 2, 2, 3, 3, 3, 3, 3]}],
+ "description": "Instantly explode all the energy that you have accumulated with your attacks."}
+```
+- `per_level[0]` = เลเวล 1 ตัดเลเวลที่เป็น 0 ท้ายๆ ออกแล้ว
+- `attr_id` = ชนิดค่า (ดาเมจ ระยะ คูลดาวน์ ฯลฯ) ยังไม่มีตารางบอกความหมาย ที่ใช้บ่อย: 1, 15, 12, 18, 13, 19 ลองเทียบกับ `nAttrID` ใน `tb_skilllevel`
+- 121 สกิลชื่อ `[미번역]` ("ยังไม่แปล") เป็นอย่างนี้มาจากไฟล์ต้นฉบับ
+
+**`qt.json`:**
+```json
+{"id": 8, "kill_monsters": [[1001201, 10]], "collect_items": [], "meet_npcs": [],
+ "start_items": [], "step_items": [], "values": [1800, 500, 1, 0], "reward_items": []}
+```
+- `kill_monsters` = `[รหัสมอน, จำนวน]` (รหัสตรงกับ `mob_list`) · `collect_items` = `[item ID, จำนวน]` · `meet_npcs` = รหัส NPC ที่ต้องไปคุย · `reward_items` = `[item ID, จำนวน]` · `start_items` = ของที่ได้ตอนรับเควส (เดา)
+- ⚠️ `values` (น่าจะเป็น EXP/เงิน/ชื่อเสียง) กับเลข `id` **ไม่ตรงกับ `tb_listquest`** ทุกเควส อาจเป็นข้อมูลรุ่นเก่าหรือใช้ลำดับเควสคนละแบบ ใช้เป็นแนวทางออกแบบเงื่อนไขเควสได้ แต่อย่าถือว่าตรงกับ `tb_listquest` แบบ 1:1
+- ฟิลด์ `f1`–`f5`, `flag`, `a`, `unknown_list`, `extra_ids` ยังไม่รู้ความหมาย
+
 ---
 
 ## 12.6 สคริปต์ NPC / บทพูด (`_scripts/`)
@@ -759,6 +792,7 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 | `.luc` (935) | ✅ **แกะแล้ว** → `_scripts/` 934 ไฟล์ (ข้อความ + โครงสร้าง, ยังไม่เป็นโค้ด Lua ที่อ่านได้) | ถ้าต้องการโค้ดเต็ม ใช้ decompiler Lua 5.0 กับ `.luac` |
 | จุดเกิดมอนสเตอร์ | ไม่อยู่ในไคลเอนต์ | วางเอง |
 | `.tbl` (93 ตาราง) | ✅ **แกะแล้ว** → `_tables/` | — |
+| `qt.tab`, `mob.mdd`, `skill.skl`, `skillcnt.cnt` | ✅ **แกะแล้ว** → `_tables_extra/` (ความหมายบางฟิลด์ยังเดา) | — |
 | สเตตัสมอนสเตอร์, ตาราง EXP | ตารางในไคลเอนต์ว่าง (อยู่ที่เซิร์ฟเวอร์) | ตั้งเอง |
 | `.etb` (23 ไฟล์ เช่น `mon_data.etb`, `pet.etb`) | เข้ารหัส และ `Game.exe` มีตัวกันโกง (XIGNCODE) | ส่วนใหญ่ซ้ำกับ `.tbl` ที่แกะแล้ว |
 | `.att`, `.cob` | ไม่ได้แกะ | น่าจะเป็น collision ของพื้น |
@@ -788,6 +822,7 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 | `stage_render.py` | รูป preview ด่าน: พื้น + วัตถุ | `python stage_render.py t1_s1` |
 | `luc.py` | `.luc` → `_scripts/*.json` + `.luac` มาตรฐาน | `python luc.py` |
 | `dialogue.py` | สรุป `_dialogue.json` + `_api.txt` | `python dialogue.py` (รันหลัง `luc.py`) |
+| `extra_tables.py` | `mob.mdd`, `skill.skl`, `skillcnt.cnt`, `qt.tab` → `_tables_extra/` | `python extra_tables.py` |
 
 ### รูปแบบไฟล์ต้นฉบับ (สรุป)
 ทุกไฟล์เป็น little-endian ข้อความเป็น CP949 (เกาหลี)
@@ -804,4 +839,7 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
   - ข้อความ = `u16 len` + byte ที่ **XOR 0x11 แล้วเก็บกลับด้าน** เป็น UTF-8 (ไทย/เกาหลี)
 - **`.map`:** `u32 w, u32 h` · ต่อคอลัมน์: `[ชั้น 0 × h][ชั้น 1 × h]` ช่องละ 36B = `16 × u16 tile` + 4B attr · tile 32 px
 - **`.prj`:** ชื่อ @0 · path bg @0x60, til @0xE0, map @0x160 (ช่องละ 0x80) · `u32 n` + รายชื่อ .spr · `u32 n` + รายชื่อ .mot · `u32 ntil, w, h` + til + map · `u32 nbg` + bg · `u32 n` + ประตู 160B (`name[0x80], x1,y1,x2,y2, theme, stage, tx, ty`) · `u32 n` + จุดเกิด 16B · `u32 n` + วัตถุ (name, id, spr, mot, ท้ายยาวไม่เท่ากันตามชนิด) · ตารางวาง: กลุ่ม `(n, w, h)` = parallax หรือ `(n)` = ชั้นหลัก, แต่ละรายการ 37B (`name[16], u32, u32 object_id, u8, f32 scale, i32 x, i32 y`)
+- **`skill.skl`:** ช่องละ 32 byte · ช่องตัวเลข/ชื่อ = XOR `0xAA` จบด้วย `0x55` · คำอธิบาย = ข้อความธรรมดา 128 byte · 1 สกิล = `22 + 41 × nAttr` ช่อง
+- **`skillcnt.cnt`:** ช่องละ 64 byte UTF-16LE, byte ที่ไม่ใช่ 0 ถูก XOR `0xAA` · **`mob.mdd`:** `u32 n` + `n × u32`
+- **`qt.tab`:** `u16 n` · แต่ละเควส: `u16 id, u16, u16, i32, i16, u8 flag, u8 0x77, u8` + รายการนับจำนวน 6 ชุด (ขนาดรายการ 12, 12, 8, 4, 8, 4 byte) + `i32` + `4 × u32` + รายการ 8 byte + รายการ 4 byte
 - **`.luc`:** Lua 5.0 bytecode ที่ตัดคำว่า `Lua` ออกจาก signature (`1B 50 …`) และทุกข้อความถูกเลื่อน: `ตัวจริง[i] = byte[i] − (i+1)` · opcode เป็นมาตรฐาน
