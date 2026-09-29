@@ -116,7 +116,7 @@ Avatar/avatar_dress/
 | `delay` | เวลาค้างเฟรม หน่วย tick ของเกมต้นฉบับ | ⚠️ ไม่รู้ว่า 1 tick กี่ ms (เริ่มที่ 1/30 วิ แล้วจูนด้วยตา) |
 | `sound` | รหัสเสียงที่เล่นตอนถึงเฟรมนี้ (0 = ไม่มี) | ⚠️ เดา ยังไม่รู้ว่ารหัสไหนคือไฟล์ไหน |
 | `item_ids` | item ID ในเกมต้นฉบับที่ใช้ชิ้นนี้ (มีเฉพาะแบบ B) | ✅ |
-| `raw` | ค่าดิบ 15 ช่อง: `[0]=frame [1]=delay [2]=x [3]=y [5]=layer [14]=sound` ที่เหลือยังไม่รู้ (น่าจะเป็นจุดปล่อยเอฟเฟกต์/ลูกธนู) | — |
+| `raw` | ค่าดิบ 15 ช่อง: `[0]=frame [1]=delay [2]=x [3]=y [5]=layer [14]=sound` · **`[10]=frame [11]=x [12]=y [13]=layer` = สไปรต์ชิ้นที่สองของชิ้นเดียวกัน** (`[10] = -1` คือไม่มี) เช่นผมยาวด้านหลังตัว (layer −8) อาวุธอีกครึ่ง (layer −2) · `[4], [6..9]` ยังไม่รู้ | ✅ ชิ้นที่สองทดสอบแล้ว |
 
 **โฟลเดอร์ที่ไม่มี `_motion.json`** มี 2 กรณี:
 - ไอคอน / UI / รูปนิ่ง ใช้ PNG ตรงๆ ได้เลย
@@ -274,6 +274,8 @@ func frames_of(motion: StringName) -> Array:
 class_name Paperdoll
 extends Node2D
 ## Stacks GhostParts; the "body" slot drives timing, every slot shows the same frame index.
+## Each frame can draw TWO sprites per part: the main one (frame/x/y/layer) and a second one
+## from raw[10..13] (frame, x, y, layer) — e.g. back hair behind the body, the far side of a weapon.
 
 signal motion_finished(motion: StringName)
 
@@ -283,7 +285,7 @@ signal motion_finished(motion: StringName)
 var motion: StringName = &"STAND_1"
 var looping := true
 var _parts: Dictionary = {}    # slot -> GhostPart
-var _sprites: Dictionary = {}  # slot -> Sprite2D
+var _sprites: Dictionary = {}  # slot -> [main Sprite2D, second Sprite2D]
 var _frame := 0
 var _elapsed := 0.0
 var _done := false
@@ -293,15 +295,19 @@ func set_part(slot: StringName, part: GhostPart) -> void:
 	if part == null:
 		_parts.erase(slot)
 		if _sprites.has(slot):
-			_sprites[slot].queue_free()
+			for s in _sprites[slot]:
+				s.queue_free()
 			_sprites.erase(slot)
 		return
 	_parts[slot] = part
 	if not _sprites.has(slot):
-		var sprite := Sprite2D.new()
-		sprite.centered = false
-		add_child(sprite)
-		_sprites[slot] = sprite
+		var pair: Array[Sprite2D] = []
+		for i in 2:
+			var sprite := Sprite2D.new()
+			sprite.centered = false
+			add_child(sprite)
+			pair.append(sprite)
+		_sprites[slot] = pair
 	_apply()
 
 
@@ -346,23 +352,34 @@ func _body_frames() -> Array:
 	return body.frames_of(motion) if body else []
 
 
-@warning_ignore("integer_division")
 func _apply() -> void:
 	for slot in _parts:
-		var sprite: Sprite2D = _sprites[slot]
-		var frames: Array = _parts[slot].frames_of(motion)
-		if _frame >= frames.size():
-			sprite.visible = false
+		var part: GhostPart = _parts[slot]
+		var main: Sprite2D = _sprites[slot][0]
+		var second: Sprite2D = _sprites[slot][1]
+		var frames: Array = part.frames_of(motion)
+		if _frame >= frames.size():  # this part has no such motion / fewer frames
+			main.visible = false
+			second.visible = false
 			continue
 		var f: Dictionary = frames[_frame]
-		var tex: Texture2D = _parts[slot].texture(int(f["frame"]))
-		sprite.visible = tex != null
-		if tex == null:
-			continue
-		sprite.texture = tex
-		sprite.offset = Vector2(int(f["x"]) - tex.get_width() / 2, int(f["y"]) - tex.get_height() / 2)
-		sprite.z_index = int(f["layer"])
+		var raw: Array = f["raw"]
+		_place(main, part, int(f["frame"]), int(f["x"]), int(f["y"]), int(f["layer"]))
+		_place(second, part, int(raw[10]), int(raw[11]), int(raw[12]), int(raw[13]))
+
+
+@warning_ignore("integer_division")
+func _place(sprite: Sprite2D, part: GhostPart, index: int, x: int, y: int, layer: int) -> void:
+	var tex: Texture2D = part.texture(index) if index >= 0 else null
+	sprite.visible = tex != null
+	if tex == null:
+		return
+	sprite.texture = tex
+	sprite.offset = Vector2(x - tex.get_width() / 2, y - tex.get_height() / 2)
+	sprite.z_index = layer
 ```
+
+> ⚠️ **ต้องวาดสไปรต์ชิ้นที่สองด้วย** (`raw[10..13]`) ผมยาว 558/602 ชิ้น, หมวก 1,102/1,194, อาวุธ 897/1,252, อาวุธเสริม 265/324 และตา 265/745 ใช้ชิ้นที่สอง ถ้าไม่วาด ผมยาวด้านหลังหาย และอาวุธอีกครึ่งหาย (ตรวจด้วยการประกอบรูปแล้ว: `_tools/paperdoll2.png` คอลัมน์ซ้ายไม่วาดชิ้นที่สอง คอลัมน์ขวาวาด)
 
 ### 6.5 ใช้งาน
 
@@ -442,6 +459,42 @@ Player (CharacterBody2D)
 
 ### เอฟเฟกต์ (`OBJ/Effect`)
 ชื่อท่าส่วนใหญ่ว่าง (`""`) หรือเป็นภาษาเกาหลี: `공격` (โจมตี), `이펙트` (เอฟเฟกต์), `명중` (โดนเป้า), `발사` (ยิง), `시전` (ร่าย), `발동` (ทำงาน), `폭발` (ระเบิด), `타격` (กระแทก), `대기` (รอ) ใช้ท่าแรกที่มีได้เลย
+
+### 7.1 ความครบของชิ้นส่วนเทียบกับตัวละคร (ตรวจจากข้อมูลจริง)
+
+ตัวละคร (`avatar_skin`, 28 สีผิว) มีครบ 32 ท่า และทุกชิ้นมี `_motion.json` ครบ แต่ไม่ใช่ทุกชิ้นจะมีครบทุกท่า:
+
+| ชิ้น | จำนวน | ไม่มีท่า | จำนวนเฟรมไม่ตรงกับตัว |
+|---|---|---|---|
+| ชุด | 2,954 | 432 ชิ้นไม่มี `ATTACK_5-7` | 160 ชิ้นใน `STRETCH_1`, `SCREAM_1`, `STICK_1-3`; 80 ใน `ATTACK_4` |
+| อาวุธ | 1,252 | 546 ชิ้นไม่มี `ATTACK_5-7`; 30 ไม่มี `SCREAM/STRETCH/ATTACK_4` | ~140 ชิ้นใน `STICK`, `SCREAM`, `STRETCH`, `ATTACK_3` |
+| ผม | 602 | 4 ชิ้นไม่มี `ATTACK_5-7` | — |
+| หมวก | 1,194 | ครบ | — |
+| ผ้าคลุม | 601 | 10 ไม่มี `ATTACK_5-7` | เล็กน้อย (`HJUMP_3` 13 ชิ้น) |
+| หน้า / ตา | 435 / 745 | 2 / 7 ชิ้น | — |
+
+- **ของรุ่นเก่าไม่มี `ATTACK_5-7`:** ของที่ทำก่อนเกมเพิ่มท่าเหล่านี้ เล่นท่านั้นแล้ว `Paperdoll` จะซ่อนชิ้นนั้น (ชุด/อาวุธหาย) → ถ้าจะใช้ `ATTACK_5-7` ให้เลือกของที่มีท่านั้น (เช็คด้วย `part.motions.has(&"ATTACK_5")`)
+- **จำนวนเฟรมไม่ตรง:** ส่วนใหญ่เป็นท่าเสริม (`STICK`, `SCREAM`, `STRETCH`) ชิ้นนั้นอาจหายในเฟรมท้ายๆ
+- **อาวุธหาย ~20% ของเฟรม:** เป็นความตั้งใจ (ซ่อนอาวุธบางจังหวะ) ไม่ใช่ข้อมูลหาย
+
+### 7.2 สกิล เอฟเฟกต์ ไอคอน — มีอะไร ขาดอะไร
+
+| เรื่อง | สถานะ | แหล่ง |
+|---|---|---|
+| ข้อมูลสกิล (ชื่อ คำอธิบาย ค่าทุกเลเวล) | ✅ | `tb_skill` (ไทย, 520) + `tb_skilllevel` + `_tables_extra/skill` (อังกฤษ, 577) |
+| สกิล → เอฟเฟกต์ | ✅ `tb_skilleffect.csv`: `nID` = รหัสสกิล, `nAttackEffectID1/2` = รหัสเอฟเฟกต์ | 639 สกิลมีเอฟเฟกต์ |
+| เอฟเฟกต์ → รูป + ท่า | ✅ **ครบทั้ง 559 เอฟเฟกต์** หาโฟลเดอร์จากรหัสใน `_item_index.json` (เลือก path `OBJ/Effect/...` ที่ไม่มี `_2D`) | เช่น `1201` → `OBJ/Effect/attack/171_attack_1201` |
+| เสียงเอฟเฟกต์ | ⚠️ 285/559 | `tb_SkillSound.csv` |
+| ไอคอนสกิล | ⚠️ มีรูป 540 ไอคอน (`image/icon/Icon_Skill/NNN.png`, 34×34) แต่ **ไม่มีข้อมูลว่าไอคอนไหนของสกิลไหน** เทียบลำดับกับ `tb_skill` ตรงบางตัว (0 = วิชาตัวเบา, 3 = ฝ่ามือวายุ, 10 = เพิ่มพลังโจมตี) แต่ไม่ตรงทุกตัว → จับคู่เองด้วยตา | |
+| สกิลใช้ท่าตัวละครท่าไหน | ❌ **ไม่มีในไฟล์** (น่าจะอยู่ในตัวโปรแกรมเกม) → กำหนดเอง: สกิลโจมตีระยะใกล้ใช้ `ATTACK_1-4`, สกิลเวท/ยิงใช้ `SPELL_1-3`, บัฟใช้ `SCREAM_1`, โจมตีขึ้นใช้ `UPPER_1-2` | |
+| จังหวะตีโดน (เฟรมไหน) | ❌ ไม่มี → กำหนดเอง (เช่นเฟรมกลางของท่าโจมตี) | |
+
+**วางเอฟเฟกต์ตรงไหน** (ทดสอบด้วยรูป `_tools/effect_test.png`):
+- ใช้จุดยึดเดียวกับตัวละคร (เท้า) และสูตรเดียวกัน `(x - w/2, y - h/2)`
+- **เอฟเฟกต์ที่อยู่บนตัว** เช่น 1324 (ตัวอักษร 梅花 เหนือหัว + ประกายบนตัว), 1326 (รอยฟันรอบตัว): ตำแหน่งถูก
+- **กระสุน/ลูกพลัง** (เช่น 1201 ฝ่ามือวายุ) กับ**ระเบิดที่เป้า** (1330, 1476): ข้อมูลวางไว้ที่จุดยึด ต้องให้โค้ดเกมย้ายเอง เช่นให้กระสุนเริ่มที่ความสูงมือแล้ววิ่งไปข้างหน้า หรือให้ระเบิดเกิดที่ตำแหน่งศัตรู
+- **เอฟเฟกต์ที่มีพื้นหลังสีดำ** ใส่ `CanvasItemMaterial` → `blend_mode = BLEND_MODE_ADD`
+- **ทิศ:** ถ้าตัวละครหันขวา (`scale.x = -1`) ให้กลับเอฟเฟกต์ด้วย วาง node เอฟเฟกต์เป็นลูกของ Paperdoll หรือกลับ `scale.x` เหมือนกัน
 
 ---
 
