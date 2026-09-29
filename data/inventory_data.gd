@@ -28,6 +28,12 @@ func get_attack_power_bonus() -> int:
 		total += item.attack_power_bonus
 	return total
 	
+func get_defense_bonus() -> int:
+	var total := 0
+	for item in equipped.values():
+		total += item.defense_bonus
+	return total
+
 func get_attack_speed() -> float:
 	var total := 1.0
 	for item in equipped.values():

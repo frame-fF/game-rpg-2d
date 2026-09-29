@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dihj60io0an3n" path="res://ui/inventory/inventory_ui.tscn" id="5_4ohoq"]
 [ext_resource type="Resource" uid="uid://50dekp51o0oq" path="res://entities/player/player_inventory.tres" id="6_3w0es"]
 [ext_resource type="Resource" uid="uid://c3ni3jtbrusd3" path="res://entities/player/player_appearance.tres" id="8_c8dkm"]
+[ext_resource type="PackedScene" path="res://entities/monsters/monster.tscn" id="9_monster"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5efxa"]
 size = Vector2(2000, 20)
@@ -44,3 +45,6 @@ position = Vector2(419, -19)
 [node name="InventoryUi" parent="." unique_id=1239711220 instance=ExtResource("5_4ohoq")]
 inventory = ExtResource("6_3w0es")
 appearance = ExtResource("8_c8dkm")
+
+[node name="Monster" parent="." instance=ExtResource("9_monster")]
+position = Vector2(-500, -70)

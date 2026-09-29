@@ -102,6 +102,14 @@ func _attack() -> void:
 			body.take_damage(damage)
 
 
+func take_damage(amount: int) -> void:
+	var damage := maxi(1, amount - (stats.defense + inventory.get_defense_bonus()))
+	stats.hp = maxi(stats.hp - damage, 0)
+	print("Player took ", damage, " damage. HP: ", stats.hp, "/", stats.max_hp)
+	if stats.hp == 0:
+		print("Player died")
+
+
 func _on_equipment_changed(slot: String, item: EquipmentData) -> void:
 	if slot == "weapon":
 		var weapon := item as WeaponData

@@ -6,7 +6,10 @@ class_name StatsData
 @export var exp_to_next_level: int = 100
 
 @export var max_hp: int = 100
-@export var hp: int = 100
+@export var hp: int = 100:
+	set(value):
+		hp = value
+		emit_changed()
 
 @export var defense: int = 5
 @export var resistance: int = 0
