@@ -18,7 +18,8 @@
 9. [ไอคอนไอเทม](#9-ไอคอนไอเทม)
 10. [UI](#10-ui)
 11. [ฉากหลังและพื้น](#11-ฉากหลังและพื้น)
-12. [เสียง](#12-เสียง)
+11.5 [ด่าน](#115-ด่าน-_stages)
+12. [เสียง](#12-เสียง) · [12.5 ตารางข้อมูลเกม](#125-ตารางข้อมูลเกม-_tables) · [12.6 สคริปต์ NPC / บทพูด](#126-สคริปต์-npc--บทพูด-_scripts)
 13. [ขั้นตอนเริ่มโปรเจกต์ใหม่ทีละขั้น](#13-ขั้นตอนเริ่มโปรเจกต์ใหม่ทีละขั้น)
 14. [กับดักที่ต้องรู้](#14-กับดักที่ต้องรู้)
 15. [สิ่งที่ยังไม่รู้ / ยังไม่ได้แกะ](#15-สิ่งที่ยังไม่รู้--ยังไม่ได้แกะ)
@@ -46,6 +47,10 @@
 | `sound/` | เสียง `.wav` 1,390 + `.mp3` 190 (เพลง 92 + เสียงพากย์ 98) | SFX, BGM |
 | `UserData/GuildMark` | ตรากิลด์ `.bmp` 552 ภาพ | |
 | `_item_index.json` | item ID → โฟลเดอร์ (ดูหัวข้อ 4) | ฐานข้อมูลไอเทม |
+| `_items.json` | **ไอเทม 11,792 ชิ้น: ชื่อ + สเตตัส + ราคา + ไอคอน + ชิ้นที่ใส่** รวมไว้ในไฟล์เดียว (ดูหัวข้อ 4.1) | ฐานข้อมูลไอเทมพร้อมใช้ |
+| `_tables/` | ตารางข้อมูลเกม 93 ตาราง เป็น `.csv` (เปิดใน Excel ได้) + `.json` (ดูหัวข้อ 12.5) | สกิล เควส NPC ร้านค้า คราฟต์ แผนที่ ข้อความ |
+| `_stages/` | **ด่าน 1,297 ด่าน**: พื้น ประตูวาร์ป จุดเกิด วัตถุที่วาง ชั้น parallax (ดูหัวข้อ 11.5) | ทำด่าน |
+| `_scripts/` | **สคริปต์ NPC 934 ไฟล์ + บทพูด 42,515 บรรทัด** (ดูหัวข้อ 12.6) | บทสนทนา เควส |
 | `_tools/` | สคริปต์ Python ที่ใช้แกะไฟล์ + รูปตัวอย่าง `paperdoll.png` | แกะใหม่ / ตรวจผล |
 
 รูปทั้งหมดเป็น **PNG พื้นโปร่งใส (RGBA)** ใช้ใน Godot ได้ทันที
@@ -149,7 +154,20 @@ Avatar/avatar_dress/
 | `741` | อาวุธเสริม |
 | `921`, `923` | สัตว์เลี้ยง / ของเล่น pet |
 
-**ชื่อ/ราคา/สเตตัสไอเทมไม่มีในนี้** อยู่ในไฟล์ `.tbl` ที่ยังไม่ได้แกะ (หัวข้อ 15) ต้องตั้งเอง
+### 4.1 `_items.json` — ไอเทมพร้อมใช้ (ใช้ไฟล์นี้เป็นหลัก)
+
+รวม `tb_Item` (ชื่อ/สเตตัส/ราคา) กับ `_item_index.json` (รูป) ไว้แล้ว มี 11,792 ชิ้น ในนั้นมีไอคอน 10,675 ชิ้น และมีชิ้นส่วนที่ใส่บนตัวได้ 4,901 ชิ้น
+
+```json
+{"id": 8110011, "name": "무사평복(남)",
+ "icon": "OBJ/Item/dp_dress/000_무사평복_남",
+ "part": "Avatar/avatar_dress/002_d_m_m_001",
+ "stats": {"nSex": 1, "nLevel": 1, "nDefence": 3, "nEnchant": 10, "nPrice": 800, "nTrade": 1, "nOverlap": 1, "nInventory": 1, "nSlotPosition": 1}}
+```
+
+- `icon` / `part` = path ใน `Ghost Assets` (`null` = ไม่มี) · `part` เลือกไฟล์รุ่นใหม่ (`Avatar_*`) ให้แล้ว
+- `stats` เก็บเฉพาะค่าที่ไม่ใช่ 0 (ความหมายของแต่ละคอลัมน์ดูหัวข้อ 12.5)
+- **ชื่อไอเทมเป็นภาษาเกาหลี** (ไฟล์ไคลเอนต์ไทยก็เก็บชื่อไอเทมเป็นเกาหลี) ต้องแปลเองหรือตั้งชื่อใหม่ ส่วนข้อความอื่นในเกม (สกิล เควส NPC แผนที่) เป็นภาษาไทย
 
 ---
 
@@ -518,7 +536,7 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 ## 11. ฉากหลังและพื้น
 
 ### ฉากหลัง `Back/*.png`
-- ชื่อไฟล์บอกชุด: `45_0.png` กับ `45_0_s.png` เป็นของด่าน 45 ทั้งคู่ (`_s` เป็นรูปขนาดเล็กกว่า ⚠️ เดาว่าเป็นชั้นไกลของ parallax ยังไม่ได้ยืนยัน)
+- ชื่อไฟล์บอกชุด: `45_0.png` กับ `45_0_s.png` เป็นของชุด 45 ทั้งคู่ (`_s` เป็นรูปขนาดเล็กกว่า) ด่านไหนใช้ฉากหลังไหน ดูจาก `background` ใน `_stages/*.json` เช่น `t1_s1` ใช้ `Back/t11_2_s`
 - ขนาดมีหลายแบบ: 256², 512², 800×600, 1280×1024
 - ใช้ `Parallax2D` (Godot 4.3+) หรือ `ParallaxBackground` + `ParallaxLayer`:
   - ชั้นไกล: `scroll_scale = Vector2(0.2, 0.2)`, ชั้นกลาง: 0.5
@@ -526,12 +544,61 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 - ตั้ง `z_index` ให้ติดลบมากๆ (เช่น -100) หรือวางใน `CanvasLayer` ที่ `layer = -1` จะได้อยู่หลังตัวละครเสมอ
 
 ### พื้น `Tile/*.png`
-- `1.png`, `46_1.png` ฯลฯ เป็น **atlas 1024×1024** รวมชิ้นแท่นหิน หญ้า หน้าผา ขนาดไม่เท่ากัน **ไม่ใช่ grid สี่เหลี่ยมเท่ากัน**
+- `t1_1.png`, `t8_1.png` ฯลฯ เป็น **atlas 1024×1024 แบ่งเป็นช่อง 32×32 px** (32×32 = 1,024 ช่อง) เลขช่อง = `แถว × 32 + คอลัมน์` เป็นเลขเดียวกับที่ `.map` อ้างถึง (ดูหัวข้อ 11.5)
 - `_0_00.png`, `t14_2_00.png` … เป็น atlas 256×256 หลายแผ่นจากไฟล์เดียว
-- วิธีที่ง่ายที่สุด: `Sprite2D` ตั้ง `region_enabled = true` แล้วตัดชิ้นที่ต้องการ วางเป็นแท่น แล้วใส่ `StaticBody2D` + `CollisionShape2D` ไว้ที่ขอบบน (หรือ `one_way_collision` ถ้าเป็นแท่นที่กระโดดทะลุขึ้นได้)
-- ถ้าอยากใช้ `TileMapLayer` ต้องตัด atlas เป็นชิ้นขนาดเท่ากันเอง (เช่น 32×32) งานเยอะ ไม่แนะนำ
+- ใช้กับ `TileMapLayer` ได้ตรงๆ: สร้าง `TileSet` แบบ `tile_size = 32×32` แล้วเพิ่ม atlas source จาก PNG ช่อง (x, y) ใน Godot = (`index % 32`, `index / 32`)
 
-เลย์เอาต์แผนที่จริงของเกม (`.map`) **ยังไม่ได้แกะ** ต้องออกแบบด่านเอง
+---
+
+## 11.5 ด่าน (`_stages/`)
+
+แกะจาก `data/Project/*.prj` + `data/Map/*.map` ได้ **1,297 ด่าน** เป็น JSON ด่านละไฟล์ (`_stages/t1_s1.json` …) ดูรูปตัวอย่างที่ประกอบแล้วได้ที่ `_stages/_preview/t1_s1.png` (หมู่บ้าน 청음관)
+
+**ชื่อไฟล์:** `t<ธีม>_s<ด่าน>` เช่น `t1_s1` = ธีม 1 ด่าน 1 · ชื่อด่านภาษาไทยดูได้ใน `_tables/tb_Map.csv` (`nTheme`, `nStage`, `szStageName`, `szBGM1`)
+
+```json
+{
+ "name": "청음관",
+ "background": "Back/t11_2_s",            ← ภาพฉากหลัง (Back/*.png)
+ "tileset": "Tile/t1_1",                  ← atlas ของพื้น (Tile/*.png)
+ "map": "t1_s1.map",                      ← ไฟล์ grid พื้น (อ่านด้วย maprender.py)
+ "portals": [
+  {"name": "청음관의원내부", "rect": [5013, 1077, 5118, 1120],
+   "target": "t1_s41", "target_pos": [755, 600]}          ← เดินเข้ากรอบนี้ → วาร์ปไปด่าน t1_s41 จุด (755, 600)
+ ],
+ "spawns": [{"a": 1, "b": 1, "x": 1200, "y": 1200}, ...], ← จุดเกิด/เกิดใหม่ของผู้เล่น
+ "objects": [                                             ← รายการวัตถุที่ใช้ในด่าน
+  {"id": 3140701, "name": "나무1", "sprite": "OBJ/Object/tree_14", "motion": "OBJ/Object/tree_14"}
+ ],
+ "layers": [                                              ← วัตถุที่วางจริง แยกเป็นชั้น
+  {"width": 4000, "height": 1920, "items": [...]},        ← ชั้น parallax (มี width = กว้างเท่านี้ เลื่อนช้ากว่าฉาก)
+  {"width": null, "height": null, "items": [              ← ชั้นหลักของด่าน (null = ใช้ขนาดแผนที่)
+    {"name": "나무1", "object_id": 3140701, "x": 1840, "y": 1676, "scale": 1.2, "flag": 1}
+  ]}
+ ]
+}
+```
+
+**พื้น (`.map`):**
+- grid ขนาด `w × h` ช่อง ช่องละ **32 px** (เช่น `t1_s1` = 180×60 = 5,760×1,920 px)
+- แต่ละช่องมี 2 ชั้น (หน้า/หลัง) ชั้นละไม่เกิน 16 tile ซ้อนกัน อ่านด้วย `_tools/maprender.py` (ฟังก์ชัน `cells()` ให้ `(x, y, layer, [tile index…], attr)`)
+- ไฟล์: `u32 w, u32 h` แล้วเก็บ**ทีละคอลัมน์**: คอลัมน์ละ `[ชั้น 0: h ช่อง][ชั้น 1: h ช่อง]`, ช่องละ 36 byte = `16 × u16 tile` (`0xFFFF` = ว่าง) + 4 byte attribute (ยังไม่รู้ความหมาย)
+
+**การวางวัตถุ:** `x, y` ใช้หลักเดียวกับตัวละคร (จุดยึด) → วาดเฟรมแรกของท่าแรกใน `_motion.json` ของ sprite นั้นที่ `(x + fx - w/2, y + fy - h/2)` แล้วคูณ `scale` ทดสอบแล้ว: บ้าน ต้นไม้ สะพาน วางบนพื้นตรงตำแหน่ง
+
+**เอาเข้า Godot:**
+1. พื้น → `TileMapLayer` (tile 32×32) วนทุกช่องจาก `.map` แล้ว `set_cell(Vector2i(x, y), 0, Vector2i(t % 32, t / 32))` ทำ 2 `TileMapLayer` สำหรับ 2 ชั้น
+2. วัตถุชั้นหลัก → `GhostPart` + `Paperdoll` (หัวข้อ 6) หรือ `Sprite2D` วางตาม `x, y, scale`
+3. ชั้น parallax → `Parallax2D` ชั้นละ node, `scroll_scale.x ≈ layer.width / ความกว้างแผนที่`
+4. ประตู → `Area2D` ขนาด `rect` เมื่อผู้เล่นเข้า → โหลดด่าน `target` แล้ววางผู้เล่นที่ `target_pos`
+5. เอฟเฟกต์ที่มีพื้นหลังสีดำ (ไฟสีฟ้า วงกลมดำในรูป preview) เป็นแบบ **additive blend** → ใส่ `CanvasItemMaterial` ตั้ง `blend_mode = BLEND_MODE_ADD` สีดำจะหายไป
+
+**ข้อจำกัด:**
+- **collision ของพื้นไม่มี:** ต้องสร้างเองจากช่องที่มี tile เช่นใส่ physics ใน TileSet หรือใช้ `.att` ที่ยังไม่ได้แกะ
+- **จุดเกิดมอนสเตอร์ไม่มี:** อยู่ที่เซิร์ฟเวอร์
+- **ค่า `width` ของชั้น parallax บางด่านอาจผิด:** ด่านที่มีข้อมูลพิเศษก่อนตารางวัตถุ ใช้วิธีสแกนหาเร็คคอร์ดแทน ตำแหน่งวัตถุถูก แต่การแบ่งชั้นอาจเพี้ยน
+- **แกะไม่ได้ 8 ด่าน:** ไฟล์เล็กผิดปกติหรือด่านอีเวนต์ที่ไม่มีวัตถุ (`t16_s2`, `t201_s1`, `t201_s2`, `t202_s1`, `t204_s2`, `t39_s2`, `t42_s41`, `t500_s1`)
+- **ประตู 96 จาก 1,811 อัน** ชี้ไปด่านที่ไม่มีในไคลเอนต์แล้ว
 
 ---
 
@@ -552,7 +619,92 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 
 - เพลง: `AudioStreamPlayer` เปิด loop ใน Import dock (`.mp3` → Loop)
 - เสียงในฉาก: `AudioStreamPlayer2D` (เบาลงตามระยะ)
-- รหัส `sound` ใน `_motion.json` **ไม่ตรงกับชื่อไฟล์** (ตารางจับคู่อยู่ใน `.tbl` ที่ยังไม่ได้แกะ) ให้ผูกเสียงกับท่าเอง เช่น "เล่น `03_Attack.wav` ตอนเริ่ม `ATTACK_1`"
+- รหัส `sound` ใน `_motion.json` **ยังจับคู่กับไฟล์ไม่ได้** ให้ผูกเสียงกับท่าเอง เช่น "เล่น `03_Attack.wav` ตอนเริ่ม `ATTACK_1`"
+- **ตารางที่ช่วยได้:**
+  - `_tables/tb_SkillSound.csv`: เอฟเฟกต์สกิล → ไฟล์เสียง เช่น `1001` → `sound/Cha_Effect/Cha_MJ_width.wav` (เอฟเฟกต์ `1001` คือ `OBJ/Effect/attack/003_attack_1001`)
+  - `_tables/tb_Map.csv`: ด่าน → เพลง BGM เช่น "ด่านชิงอิน" → `BGM_chungumgwan.mp3`
+
+---
+
+## 12.5 ตารางข้อมูลเกม (`_tables/`)
+
+แกะจาก `zThailand/chart/*.tbl` ได้ 93 ตาราง แต่ละตารางมีทั้ง `.csv` (UTF-8, เปิดใน Excel ได้) และ `.json` (array ของ object) ชื่อคอลัมน์ขึ้นต้นตามชนิดข้อมูล: `n` = ตัวเลข, `sz` = ข้อความ, `e` = enum, `b` = 0/1
+
+**ตารางสำคัญ:**
+
+| ตาราง | แถว | คอลัมน์หลัก | ใช้ทำ |
+|---|---|---|---|
+| `tb_Item` | 11,792 | `nID, szName, eJob, nSex, nLevel, nType, nPAttack, nMAttack, nPRange, nMRange, nDefence, nAttackSpeed, nEnchant, nPrice, nStrangth, nDexterity, nConstitution, nIntellect, nDodge, nHitPoint, nSpiritPoint, nCritical, nOverlap, nSlotPosition, szTooltip` | ไอเทม (รวมใน `_items.json` แล้ว) |
+| `tb_skill` | 520 | `nID, szName, mClass, mJob, nWeaponType, bIsActive, nTargetCount, nRespellTime, nRangeType, szSkillInfo` | รายชื่อสกิล (ภาษาไทย) |
+| `tb_skilllevel` | 15,746 | `nSkillNo, nLevel, nSpendHP, nSpendSP, nDurationTime, nAttackRange, nAttrID1-7, nValue1-7` | ค่าสกิลแต่ละเลเวล |
+| `tb_LearnSkill` | 341 | | เงื่อนไขเรียนสกิล |
+| `tb_JobBase`, `tb_JobGrowth` | 13 / 131 | `szName, eClass, eJob, nGlowthHP, nGlowthSP, nGlowthAtt, nGlowthDef` | อาชีพ + ค่าที่เพิ่มต่อเลเวล |
+| `tb_listquest` | 2,831 | `nStartLevel, nEndLevel, eJob1-6, szQuestName, szQuestText1-4, szQuestInfo1-5, nR_Exp, nR_Money, nR_ItemID1-4, nR_Count1-4` | เควส + บทพูด + รางวัล |
+| `tb_letterquest` | 201 | | เควสจดหมาย |
+| `tb_npc` | 815 | `nID, scNPCName, bShowMinimap` | ชื่อ NPC |
+| `tb_NpcStoreL`, `tb_NpcStoreItem` | 104 / 3,085 | `nStoreID, nItemID, nMoney, nMoneyType` | ร้านค้า NPC ขายอะไร ราคาเท่าไร |
+| `tb_RecipeList` | 985 | `szRecipeName, nResult, nResultCount, nMaterialID1-9, nMCount1-9` | สูตรคราฟต์ |
+| `tb_UpgradeEquip`, `tb_upgradeitem`, `tb_EquipRefine`, `tb_enchantacc` | | | ตีบวก / อัปเกรด |
+| `tb_Socket` | 350 | | ช่องใส่หิน |
+| `tb_SetEquipItem`, `tb_SetEquipItemValue` | 1,403 / 685 | `szSetName, eSetBenefit, nSetValue, szSetBenefitText1-2` | โบนัสเซ็ตอุปกรณ์ |
+| `tb_Map` | 1,120 | `nTheme, nStage, szStageName, szBGM1-3` | ชื่อด่าน (ไทย) + เพลง |
+| `tb_Worldmap`, `tb_themestage` | 569 / 820 | | แผนที่โลก |
+| `tb_SkillSound` | 442 | `nSkillEffectID, nSkillSndID, szSkillSndDir` | เสียงของเอฟเฟกต์สกิล |
+| `tb_String` | 7,099 | `nMSGID, szMSG, szStringDefine` | ข้อความระบบทั้งหมด (ไทย) |
+| `tb_GameTip`, `tb_HelpSay`, `tb_FortuneText` | | | ข้อความทิป / ช่วยเหลือ / ดูดวง |
+| `tb_Title`, `tb_TitleNickName` | | | ฉายา |
+| `tb_Emoticon` | 52 | | อีโมติคอน |
+| `tb_giftpocket`, `tb_PocketInfo`, `tb_SelectBox` | 22,111 / 4,500 | | กล่องสุ่ม / ของในกล่อง |
+| `tb_FilterName`, `tb_FilterChat` | 6,722 | | คำหยาบที่ห้ามใช้ |
+
+**ตารางว่าง (ไม่มีข้อมูลในไคลเอนต์):**
+- `tb_Mob` มีแค่ชื่อคอลัมน์ ครบทุกค่าที่ต้องใช้ (`nMobLv, nMobHP, nMobAtt1, nMobDefence, nMobMoveSpd, nMobEXP, nMobMoney, ...ดรอป...`) ใช้เป็นแม่แบบออกแบบ `MonsterData` ได้ แต่ค่าจริงอยู่ที่เซิร์ฟเวอร์
+- `tb_Exp` (EXP ต่อเลเวล) และ `tb_Mob_Drop` ก็ว่างเหมือนกัน
+- **สเตตัสมอนสเตอร์และตาราง EXP ต้องตั้งเอง**
+
+**ความหมายคอลัมน์ที่ยังไม่ชัวร์:** ค่า enum (`eJob`, `nType`, `nSlotPosition`, `nAttribute` ฯลฯ) เป็นตัวเลข ไม่มีตารางบอกความหมาย ต้องเดาจากข้อมูล เช่น ใน `tb_Item` ชุดมี `nSlotPosition = 1`, ผ้าคลุม = 4, ยันต์ = 17 และ `nSex`: 1 = ชาย
+
+---
+
+## 12.6 สคริปต์ NPC / บทพูด (`_scripts/`)
+
+แกะจาก `.luc` (Lua 5.0 bytecode) ได้ **934 ไฟล์**:
+- `zThailand/script/` (565 ไฟล์) **ภาษาไทย** เป็นชุดที่ไคลเอนต์ไทยใช้จริง
+- `data/OBJ/NPC/` (369 ไฟล์) ชุดเก่า ส่วนใหญ่เป็นภาษาเกาหลี
+
+| ไฟล์ | เนื้อหา | ใช้ทำ |
+|---|---|---|
+| `_scripts/_dialogue.json` | **บทพูดทั้งหมดแยกตาม NPC** (754 สคริปต์, 42,515 บรรทัด) | เอาไปทำระบบบทสนทนาได้เลย |
+| `_scripts/_api.txt` | รายชื่อฟังก์ชันที่สคริปต์เรียกใช้ 265 ตัว เรียงตามจำนวนครั้ง | ดูว่าระบบ NPC ต้องรองรับอะไรบ้าง |
+| `_scripts/<path>/npc_XXXXXX.json` | โครงสร้างสคริปต์: ฟังก์ชัน ตัวแปร ค่าคงที่ (ข้อความ ตัวเลข item ID) | ดูลำดับตรรกะของ NPC |
+| `_scripts/<path>/npc_XXXXXX.luac` | bytecode ที่ซ่อมหัวไฟล์และถอดข้อความแล้ว (Lua 5.0 มาตรฐาน) | ถ้าอยากได้โค้ด Lua เต็ม ใช้ decompiler Lua 5.0 (เช่น `luadec` รุ่น 5.0) เปิดได้ |
+
+**ชื่อไฟล์:** `npc_200003` = NPC รหัส 200003 (ตรงกับ sprite `OBJ/NPC/npc_200003`) ชื่อ NPC ดูได้ใน `_tables/tb_npc.csv`
+
+**ตัวอย่างบทพูด (ไทย):**
+```
+"ถ้าเจ้าช่วยปราบ{0xFFFFFF00}หมีภูเขาแห่งบันไดฟ้าคำราม 60 ตัว{END}ข้าจะรวบรวมหนังมันมาทำเป็นชุด..."
+"ขอบคุณมาก ทีนี่ก็โล่งใจแล้ว! นี่คือของตอบแทนเล็กๆ น้อยๆ โปรดรับไว้ด้วยเถอะ"
+```
+- `{0xAARRGGBB}ข้อความ{END}` = ข้อความสี → แปลงเป็น BBCode ของ `RichTextLabel`: `[color=#RRGGBB]ข้อความ[/color]`
+- `PLAYERNAME` = ใส่ชื่อผู้เล่นแทน
+
+**ฟังก์ชันที่ใช้บ่อย** (จาก `_api.txt`):
+
+| ฟังก์ชัน | ครั้ง | ความหมาย |
+|---|---|---|
+| `QSTATE` | 924 | สถานะเควส |
+| `NPC_SAY`, `NPC_QSAY` | 769 / 83 | NPC พูด / พูดเรื่องเควส |
+| `CHECK_ITEM_CNT`, `CHECK_INVENTORY_CNT` | 597 / 316 | เช็คจำนวนไอเทม / ช่องว่างในกระเป๋า |
+| `GET_PLAYER_LEVEL`, `GET_PLAYER_JOB1`, `GET_PLAYER_FACTION` | 557 / 79 / 40 | อ่านเลเวล อาชีพ ฝ่าย |
+| `SET_QUEST_STATE`, `ADD_QUEST_BTN`, `SET_MEETNPC` | 454 / 413 / 231 | เปลี่ยนสถานะเควส / ปุ่มเควส / นับว่าคุยกับ NPC แล้ว |
+| `ADD_SHOP_BTN`, `ADD_NEW_SHOP_BTN`, `ADD_STORE_BTN` | | ปุ่มร้านค้า / โกดัง |
+| `NPC_WARP_THEME_*`, `ADD_NPC_WARP_INDUN_EXIT` | | วาร์ปไปธีมอื่น / ออกจากดันเจี้ยน |
+
+**ข้อจำกัด:**
+- **ข้อความหาย 1,153 บรรทัด:** เป็น `???` มาตั้งแต่ไฟล์ต้นฉบับ เพราะภาษาเกาหลีหายตอนบันทึกเป็นภาษาไทย กู้ไม่ได้
+- **ยังไม่ได้แปลงเป็นโค้ด Lua ที่อ่านได้:** ต้องใช้ decompiler ภายนอก
+- **1 ไฟล์เป็น Lua 5.1** (`npc_300120`) ไม่ได้แกะ
 
 ---
 
@@ -569,7 +721,7 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 4. **ทำ Player** ตามโครงในหัวข้อ 6.5 → กด F6 ต้องเห็นตัวละครยืนหายใจ
 5. **จูน `tick_sec`** ที่ Paperdoll จนท่าเดินดูเป็นธรรมชาติ แล้วใช้ค่านั้นทั้งเกม
 6. **ทำมอนสเตอร์** จากหัวข้อ 8
-7. **ทำ ItemData** (หัวข้อ 9) โดยใช้ `_item_index.json` หาไอคอนกับชิ้นส่วนที่ใส่
+7. **ทำ ItemData** (หัวข้อ 9) จาก `_items.json` ซึ่งมีชื่อ สเตตัส ราคา ไอคอน และชิ้นที่ใส่ครบ
 8. **UI / ฉากหลัง / เสียง** ตามหัวข้อ 10–12
 9. **ตั้งค่า Export:** ใน export preset ช่อง *Filters to export non-resource files/folders* ใส่ `*.json` ไม่อย่างนั้น `_motion.json` จะไม่ติดไปกับเกม (ดูหัวข้อ 14)
 
@@ -598,14 +750,18 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 | เรื่อง | สถานะ | ผลกระทบ |
 |---|---|---|
 | หน่วยของ `delay` | ไม่รู้ | ต้องจูน `tick_sec` ด้วยตา |
-| รหัส `sound` → ไฟล์เสียง | ไม่รู้ (น่าจะอยู่ใน `.tbl`) | ผูกเสียงเอง |
+| รหัส `sound` ใน `_motion.json` → ไฟล์เสียง | ไม่รู้ (ไม่อยู่ในตารางที่แกะได้) | ผูกเสียงเอง (มีแค่เสียงสกิลใน `tb_SkillSound`) |
 | ช่อง `raw[6..13]` | ไม่รู้ (น่าจะเป็นจุดปล่อยเอฟเฟกต์/กระสุน) | กำหนดจุดยิงเอง |
 | hitbox ต่อเฟรม | มีในไฟล์ต้นฉบับ แต่ไม่ได้ export | ตั้ง collision เอง |
 | ลำดับเฟรมปุ่ม UI (ปกติ/ชี้/กด) | เดา | เปิดดูก่อนใช้ |
-| `.map` (782 ไฟล์) | ไม่ได้แกะ | ไม่มีเลย์เอาต์ด่านจริง |
-| `.prj` (1,305) | ไม่ได้แกะ | ข้อมูลฉาก |
-| `.luc` / `.lua` (~935) | ไม่ได้แกะ (Lua ที่ compile แล้ว) | เควส/บทพูด NPC |
-| `.tbl`, `.etb`, `.att`, `.cob` | ไม่ได้แกะ | ชื่อไอเทม สเตตัส ราคา ตารางเสียง collision ของพื้น |
+| `.map` + `.prj` | ✅ **แกะแล้ว** → `_stages/` 1,297 ด่าน (8 ด่านไม่ได้) | — |
+| attribute 4 byte ในแต่ละช่องของ `.map` | ไม่รู้ | collision ของพื้นต้องทำเอง |
+| `.luc` (935) | ✅ **แกะแล้ว** → `_scripts/` 934 ไฟล์ (ข้อความ + โครงสร้าง, ยังไม่เป็นโค้ด Lua ที่อ่านได้) | ถ้าต้องการโค้ดเต็ม ใช้ decompiler Lua 5.0 กับ `.luac` |
+| จุดเกิดมอนสเตอร์ | ไม่อยู่ในไคลเอนต์ | วางเอง |
+| `.tbl` (93 ตาราง) | ✅ **แกะแล้ว** → `_tables/` | — |
+| สเตตัสมอนสเตอร์, ตาราง EXP | ตารางในไคลเอนต์ว่าง (อยู่ที่เซิร์ฟเวอร์) | ตั้งเอง |
+| `.etb` (23 ไฟล์ เช่น `mon_data.etb`, `pet.etb`) | เข้ารหัส และ `Game.exe` มีตัวกันโกง (XIGNCODE) | ส่วนใหญ่ซ้ำกับ `.tbl` ที่แกะแล้ว |
+| `.att`, `.cob` | ไม่ได้แกะ | น่าจะเป็น collision ของพื้น |
 | `M000011.spr` | ถูกเข้ารหัส | ไม่มีไฟล์ไหนใช้ ไม่กระทบ |
 | `M000012.spr` | ข้อมูลเสีย | ไม่มีไฟล์ไหนใช้ ไม่กระทบ |
 
@@ -625,6 +781,13 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 | `rest.py` | UI นอก `data/`, bg/til, copy เสียง/bmp/avi | `python rest.py` |
 | `build_index.py` | สร้าง `_item_index.json` | `python build_index.py` |
 | `paperdoll.py` | ประกอบตัวละครจาก `Ghost Assets` → `paperdoll.png` ไว้ตรวจตำแหน่ง | `python paperdoll.py` |
+| `tbl.py` | `zThailand/chart/*.tbl` → `_tables/*.csv` + `*.json` | `python tbl.py` |
+| `build_items.py` | รวม `tb_Item` + `_item_index.json` → `_items.json` | `python build_items.py` (รันหลัง `tbl.py` และ `build_index.py`) |
+| `stage.py` | `.prj` → `_stages/*.json` | `python stage.py` |
+| `maprender.py` | อ่าน/วาด `.map` ด้วย tileset (มี `cells()` ไว้ใช้ต่อ) | `python maprender.py t1_s1.map t1_1.png` |
+| `stage_render.py` | รูป preview ด่าน: พื้น + วัตถุ | `python stage_render.py t1_s1` |
+| `luc.py` | `.luc` → `_scripts/*.json` + `.luac` มาตรฐาน | `python luc.py` |
+| `dialogue.py` | สรุป `_dialogue.json` + `_api.txt` | `python dialogue.py` (รันหลัง `luc.py`) |
 
 ### รูปแบบไฟล์ต้นฉบับ (สรุป)
 ทุกไฟล์เป็น little-endian ข้อความเป็น CP949 (เกาหลี)
@@ -636,3 +799,9 @@ b.texture_pressed = load("res://ghost/zThailand/ui/common/btn_ok/002.png")
 - **`.bg`:** byte0 = 3/4 (16/32-bit) · `u16 w` @0x0F · `u16 h` @0x11 · พิกเซล @27
 - **`.til`:** มี image block แบบเดียวกับ `.spr` อยู่ 1 block (1024²) หรือหลาย block (256²)
 - จับคู่ `.csp` ↔ `.cmo` ด้วย **item_id** (จำนวนรายการไม่เท่ากันเสมอ)
+- **`.tbl`:** `"Ghost\0\0\0TH\0\0"` + วันที่ · `u32 ncol` @0x20 · `ncol × u32 type` · `u32 nrow` · ชื่อคอลัมน์ `ncol × (u16 len + ข้อความ)` · แล้วตามด้วยข้อมูลทีละแถว
+  - ขนาดตาม type: 1=u8, 2=u8, 3=i16, 4=u16, 5=i32, 6=u32, 8=f32, 10=i64, 7=ข้อความ
+  - ข้อความ = `u16 len` + byte ที่ **XOR 0x11 แล้วเก็บกลับด้าน** เป็น UTF-8 (ไทย/เกาหลี)
+- **`.map`:** `u32 w, u32 h` · ต่อคอลัมน์: `[ชั้น 0 × h][ชั้น 1 × h]` ช่องละ 36B = `16 × u16 tile` + 4B attr · tile 32 px
+- **`.prj`:** ชื่อ @0 · path bg @0x60, til @0xE0, map @0x160 (ช่องละ 0x80) · `u32 n` + รายชื่อ .spr · `u32 n` + รายชื่อ .mot · `u32 ntil, w, h` + til + map · `u32 nbg` + bg · `u32 n` + ประตู 160B (`name[0x80], x1,y1,x2,y2, theme, stage, tx, ty`) · `u32 n` + จุดเกิด 16B · `u32 n` + วัตถุ (name, id, spr, mot, ท้ายยาวไม่เท่ากันตามชนิด) · ตารางวาง: กลุ่ม `(n, w, h)` = parallax หรือ `(n)` = ชั้นหลัก, แต่ละรายการ 37B (`name[16], u32, u32 object_id, u8, f32 scale, i32 x, i32 y`)
+- **`.luc`:** Lua 5.0 bytecode ที่ตัดคำว่า `Lua` ออกจาก signature (`1B 50 …`) และทุกข้อความถูกเลื่อน: `ตัวจริง[i] = byte[i] − (i+1)` · opcode เป็นมาตรฐาน

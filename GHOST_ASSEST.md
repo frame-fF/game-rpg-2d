@@ -206,7 +206,7 @@ u16 w @0x0F, u16 h @0x11, u32 w*h @0x17, pixels @27
 
 ## 7. สคริปต์แปลง
 
-อยู่ที่ `C:\Users\fF\Desktop\Ghost Assets\_tools\` (+ `build_index.py` สร้าง `_item_index.json`) — คู่มือเต็มสำหรับโปรเจกต์ใหม่ดู [GHOST_ASSEST_GUILD.md](GHOST_ASSEST_GUILD.md)
+อยู่ที่ `C:\Users\fF\Desktop\Ghost Assets\_tools\` (+ `build_index.py` สร้าง `_item_index.json`) — คู่มือเต็มสำหรับโปรเจกต์ใหม่ดู [GHOST_ASSEST_GUIDE.md](GHOST_ASSEST_GUIDE.md)
 
 | สคริปต์ | หน้าที่ |
 |---|---|
