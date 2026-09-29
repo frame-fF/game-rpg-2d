@@ -5,8 +5,9 @@
 [ext_resource type="Script" uid="uid://b604ka12h8hfy" path="res://data/inventory_data.gd" id="2_5l1br"]
 [ext_resource type="Resource" uid="uid://i04xigg1lngp" path="res://items/weapons/sword/1/1.tres" id="3_p1vma"]
 [ext_resource type="Resource" path="res://items/armor/armor_1_f.tres" id="4_armor_f"]
+[ext_resource type="Resource" path="res://items/weapons/bow/1/1.tres" id="5_bow"]
 
 [resource]
 script = ExtResource("2_5l1br")
-items = Array[ExtResource("1_v65aq")]([ExtResource("2_2qf1j"), ExtResource("3_p1vma"), ExtResource("4_armor_f")])
+items = Array[ExtResource("1_v65aq")]([ExtResource("2_2qf1j"), ExtResource("3_p1vma"), ExtResource("4_armor_f"), ExtResource("5_bow")])
 metadata/_custom_type_script = "uid://b604ka12h8hfy"

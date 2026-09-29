@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Texture2D" uid="uid://fog4olrcgnsg" path="res://entities/player/sprites/weapons/bow/1/icon.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://dm3hge5vpfky3" path="res://data/weapon_data.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://cjw3fgibr0vad" path="res://entities/projectiles/arrow.tscn" id="3_arrow"]
+
+[resource]
+script = ExtResource("2_script")
+attack_type = "projectile"
+projectile_scene = ExtResource("3_arrow")
+attack_animation = "shoot"
+item_name = "bow_1"
+icon = ExtResource("1_icon")
+metadata/_custom_type_script = "uid://dsnryq0h70574"
