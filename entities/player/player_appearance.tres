@@ -5,6 +5,5 @@
 
 [resource]
 script = ExtResource("1_k6g3i")
-gender = "female"
 face = ExtResource("1_yxkvd")
 metadata/_custom_type_script = "uid://dvnx0kyvdvowi"
