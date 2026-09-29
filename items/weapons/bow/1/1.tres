@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://fog4olrcgnsg" path="res://entities/player/sprites/weapons/bow/1/icon.png" id="1_icon"]
 [ext_resource type="Script" uid="uid://dm3hge5vpfky3" path="res://data/weapon_data.gd" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://cjw3fgibr0vad" path="res://entities/projectiles/arrow.tscn" id="3_arrow"]
+[ext_resource type="SpriteFrames" path="res://items/weapons/bow/1/1_frames_m.tres" id="4_frames_m"]
+[ext_resource type="SpriteFrames" path="res://items/weapons/bow/1/1_frames_f.tres" id="5_frames_f"]
 
 [resource]
 script = ExtResource("2_script")
@@ -11,4 +13,6 @@ projectile_scene = ExtResource("3_arrow")
 attack_animation = "shoot"
 item_name = "bow_1"
 icon = ExtResource("1_icon")
+sprite_frames_male = ExtResource("4_frames_m")
+sprite_frames_female = ExtResource("5_frames_f")
 metadata/_custom_type_script = "uid://dsnryq0h70574"

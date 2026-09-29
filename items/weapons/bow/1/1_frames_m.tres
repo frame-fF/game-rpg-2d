@@ -1,0 +1,22 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://dxhy8ph0yxi2k" path="res://entities/player/sprites/weapons/bow/1/m/idle_0.png" id="1_idle_0"]
+[ext_resource type="Texture2D" uid="uid://ctovyvxqewk2u" path="res://entities/player/sprites/weapons/bow/1/m/idle_1.png" id="2_idle_1"]
+[ext_resource type="Texture2D" uid="uid://brsaqxuv3pcuq" path="res://entities/player/sprites/weapons/bow/1/m/idle_2.png" id="3_idle_2"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_idle_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_idle_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_idle_2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
