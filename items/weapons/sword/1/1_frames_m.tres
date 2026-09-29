@@ -1,0 +1,35 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://biyi1sjlmhjgy"]
+
+[ext_resource type="Texture2D" uid="uid://1rxqqf8hc0p6" path="res://entities/player/sprites/weapons/sword/1/m/attack_0.png" id="1_66db0"]
+[ext_resource type="Texture2D" uid="uid://djjkjtcyi3h2w" path="res://entities/player/sprites/weapons/sword/1/m/idle_0.png" id="1_tktdd"]
+[ext_resource type="Texture2D" uid="uid://b7gt72xuy0psm" path="res://entities/player/sprites/weapons/sword/1/m/attack_3.png" id="3_3p5rx"]
+[ext_resource type="Texture2D" uid="uid://c2p1l3id50y7f" path="res://entities/player/sprites/weapons/sword/1/m/idle_1.png" id="9_idle_1"]
+[ext_resource type="Texture2D" uid="uid://btk6t1cymbw7p" path="res://entities/player/sprites/weapons/sword/1/m/idle_2.png" id="10_idle_2"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_66db0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_3p5rx")
+}],
+"loop": 1,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_tktdd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_idle_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_idle_2")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]

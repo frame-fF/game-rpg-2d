@@ -1,14 +1,14 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://i04xigg1lngp"]
 
-[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/1/icon.png" id="1_u238w"]
+[ext_resource type="Texture2D" uid="uid://crb5hcmud2mx1" path="res://entities/player/sprites/weapons/sword/1/icon.png" id="1_u238w"]
 [ext_resource type="Script" uid="uid://dm3hge5vpfky3" path="res://data/weapon_data.gd" id="1_yp014"]
-[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/weapon_1_frames_m.tres" id="3_pavsn"]
-[ext_resource type="SpriteFrames" path="res://items/weapons/weapon_1_frames_f.tres" id="9_female"]
+[ext_resource type="SpriteFrames" uid="uid://biyi1sjlmhjgy" path="res://items/weapons/sword/1/1_frames_m.tres" id="3_pavsn"]
+[ext_resource type="SpriteFrames" path="res://items/weapons/sword/1/1_frames_f.tres" id="9_female"]
 
 [resource]
 script = ExtResource("1_yp014")
 attack_range = 40.0
-item_name = "weapon_1"
+item_name = "sword_1"
 icon = ExtResource("1_u238w")
 sprite_frames_male = ExtResource("3_pavsn")
 sprite_frames_female = ExtResource("9_female")

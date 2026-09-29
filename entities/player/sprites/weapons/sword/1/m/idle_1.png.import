@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c2p1l3id50y7f"
-path="res://.godot/imported/idle_1.png-493a50baf364cfc8cda2371cc03c830d.ctex"
+path="res://.godot/imported/idle_1.png-904a42ca43ac0815bb9f1e217b07c8eb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://entities/player/sprites/weapons/1/m/idle_1.png"
-dest_files=["res://.godot/imported/idle_1.png-493a50baf364cfc8cda2371cc03c830d.ctex"]
+source_file="res://entities/player/sprites/weapons/sword/1/m/idle_1.png"
+dest_files=["res://.godot/imported/idle_1.png-904a42ca43ac0815bb9f1e217b07c8eb.ctex"]
 
 [params]
 
