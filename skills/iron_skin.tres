@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PassiveSkill" format=3]
+
+[ext_resource type="Script" uid="uid://tuc6qjrq1a7n" path="res://data/passive_skill.gd" id="1_passive"]
+[ext_resource type="Script" uid="uid://k52g43n302sx" path="res://data/stat_effect.gd" id="2_stat"]
+[ext_resource type="Script" uid="uid://riue6d41y7bx" path="res://data/effect_data.gd" id="3_effect"]
+
+[sub_resource type="Resource" id="Resource_def"]
+script = ExtResource("2_stat")
+stat = "defense"
+mode = "add"
+amount = Array[float]([3.0, 6.0, 10.0])
+
+[resource]
+script = ExtResource("1_passive")
+id = "iron_skin"
+skill_name = "ผิวหนังเหล็ก"
+description = "เพิ่มพลังป้องกันถาวร"
+max_level = 3
+effects = Array[ExtResource("3_effect")]([SubResource("Resource_def")])

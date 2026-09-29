@@ -3,6 +3,7 @@ class_name SkillSetData
 
 # สกิลของตัวละคร 1 ตัว: ช่อง 1-4 + เลเวลที่เรียน + cooldown ที่เหลือ
 @export var hotbar: Array[ActiveSkill] = [null, null, null, null]
+@export var passives: Array[PassiveSkill] = [] # เรียนแล้วติดตัวถาวร
 @export var levels: Dictionary = {} # id สกิล -> เลเวล (ไม่มี = Lv1)
 var cooldowns: Dictionary = {}      # id สกิล -> วินาทีที่เหลือ (ค่าตอนเล่น ไม่เซฟ)
 

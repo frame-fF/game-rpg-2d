@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="BuffSkill" format=3]
+
+[ext_resource type="Script" uid="uid://cq3xx40gl5wbx" path="res://data/buff_skill.gd" id="1_buff"]
+[ext_resource type="Script" uid="uid://k52g43n302sx" path="res://data/stat_effect.gd" id="2_stat"]
+[ext_resource type="Script" uid="uid://cscxqph5ee1kv" path="res://data/aura_effect.gd" id="3_aura"]
+[ext_resource type="Script" uid="uid://riue6d41y7bx" path="res://data/effect_data.gd" id="4_effect"]
+
+[sub_resource type="Resource" id="Resource_def"]
+script = ExtResource("2_stat")
+stat = "defense"
+mode = "add"
+amount = Array[float]([10.0, 15.0, 20.0])
+
+[sub_resource type="Resource" id="Resource_atk"]
+script = ExtResource("2_stat")
+stat = "attack_power"
+mode = "add"
+amount = Array[float]([-5.0, -5.0, -3.0])
+
+[sub_resource type="Resource" id="Resource_aura"]
+script = ExtResource("3_aura")
+damage = Array[int]([5, 8, 12])
+radius = Array[float]([60.0, 70.0, 80.0])
+interval = 1.0
+
+[resource]
+script = ExtResource("1_buff")
+id = "flame_armor"
+skill_name = "เกราะเพลิง"
+description = "เพิ่มพลังป้องกัน แลกกับพลังโจมตี และเผาศัตรูรอบตัวทุกวินาที"
+max_level = 3
+cooldown = 20.0
+mp_cost = Array[int]([15, 18, 22])
+animation = "attack"
+skill_range = 9999.0
+duration = Array[float]([10.0, 12.0, 15.0])
+effects = Array[ExtResource("4_effect")]([SubResource("Resource_def"), SubResource("Resource_atk"), SubResource("Resource_aura")])

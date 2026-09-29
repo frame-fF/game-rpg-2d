@@ -19,6 +19,14 @@ static func hit_bodies(attacker: Node2D, bodies: Array, damage: int) -> int:
 static func hit_box(attacker: Node2D, center: Vector2, size: Vector2, damage: int) -> int:
 	var shape := RectangleShape2D.new()
 	shape.size = size
+	return _hit_shape(attacker, shape, center, damage)
+
+static func hit_circle(attacker: Node2D, center: Vector2, radius: float, damage: int) -> int:
+	var shape := CircleShape2D.new()
+	shape.radius = radius
+	return _hit_shape(attacker, shape, center, damage)
+
+static func _hit_shape(attacker: Node2D, shape: Shape2D, center: Vector2, damage: int) -> int:
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = shape
 	query.transform = Transform2D(0.0, center)

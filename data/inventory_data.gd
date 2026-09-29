@@ -45,3 +45,16 @@ func get_move_speed() -> float:
 	for item in equipped.values():
 		total *= item.move_speed_multiplier
 	return total
+
+# ใช้ใน get_stat() ของผู้เล่น: ชุดบวกตรงๆ / ชุดคูณ
+func get_flat_bonus(stat: String) -> float:
+	match stat:
+		"attack_power": return get_attack_power_bonus()
+		"defense": return get_defense_bonus()
+	return 0.0
+
+func get_multiplier(stat: String) -> float:
+	match stat:
+		"attack_speed": return get_attack_speed()
+		"move_speed": return get_move_speed()
+	return 1.0

@@ -32,8 +32,9 @@ shape = SubResource("RectangleShape2D_5efxa")
 [node name="Player" parent="." unique_id=478418677 instance=ExtResource("1_jkcsq")]
 position = Vector2(0, -100)
 
-[node name="Hud" parent="." unique_id=1784162250 instance=ExtResource("2_nb4jv")]
+[node name="Hud" parent="." unique_id=1784162250 node_paths=PackedStringArray("effects_owner") instance=ExtResource("2_nb4jv")]
 stats = ExtResource("3_d67yf")
+effects_owner = NodePath("../Player")
 
 [node name="Dummy" parent="." unique_id=406471295 instance=ExtResource("4_hhw0u")]
 position = Vector2(150, -20)

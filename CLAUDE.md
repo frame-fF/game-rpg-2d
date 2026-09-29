@@ -4,6 +4,28 @@
 สำหรับงาน Godot ทุกครั้ง (ออกแบบสถาปัตยกรรม, เขียน GDScript, debug, สร้างระบบ node/scene, migrate เวอร์ชัน ฯลฯ) ให้เรียกใช้ skill **godot-master** ก่อนเสมอ
 (ที่มา: https://github.com/thedivergentai/gd-agentic-skills)
 
+**เรียกใหม่ทุกครั้งที่เริ่มงานชิ้นใหม่** (ไม่ใช่เรียกครั้งเดียวแล้วใช้ต่อทั้งบทสนทนา) และนอกจาก godot-master ให้เรียก **skill godot อื่นทุกตัวที่ตรงกับงานนั้น** ด้วย + เปิดไฟล์อ้างอิงใน godot-master ที่ตรงเรื่อง (เช่น Combat, RPG Stats, Ability System, Inventory, Save/Load):
+
+| งาน | skill ที่ต้องเรียกเพิ่ม |
+|---|---|
+| เขียน/แก้ GDScript ทุกชนิด | `godot-gdscript`, `godot-gdscript-patterns` |
+| ข้อมูลเป็น Resource / `.tres` (stats, ไอเทม, สกิล, effect) | `godot-resources` |
+| signal, group, การสื่อสารระหว่าง node | `godot-signals-groups` |
+| สร้าง/จัด node, scene, Inherited Scene | `godot-nodes-scenes` |
+| collision layer/mask, Area2D, physics query | `godot-physics` |
+| การเคลื่อนที่ตัวละคร/มอน (CharacterBody2D) | `godot-2d-movement` |
+| AnimatedSprite2D, SpriteFrames, ท่าทาง | `godot-animation` |
+| UI (HUD, กระเป๋า, ช่องสกิล, เมนู) | `godot-ui-control` |
+| แผนที่ด้วย tile | `godot-tilemap` |
+| เสียง | `godot-audio` |
+| shader / เอฟเฟกต์ภาพ | `godot-shaders` |
+| ออนไลน์ / multiplayer | `godot-multiplayer` |
+| export / ปล่อยเกม | `godot-export` |
+| อัปเกรดเวอร์ชัน Godot | `godot-4-migration` |
+
+skill เกมทั่วไปที่ใช้ร่วมได้เมื่อตรงเรื่อง: `rpg`, `platformer`, `game-ai`, `game-feel`, `level-design`, `save-systems`, `input-systems`, `camera-systems`
+(ไม่ใช้: `godot-csharp` — เกมนี้ใช้ GDScript, `godot-3d-essentials` — เกม 2D)
+
 ## เอกสารอ้างอิงหลัก
 เวลาไม่มั่นใจเรื่อง API/property/signal ชื่อจริง (เช่น ชื่อ Color constant, property ของ node, signature ของ built-in function) ให้เช็คกับ Godot 4.7 official docs ก่อนเดา:
 - https://docs.godotengine.org/en/stable/

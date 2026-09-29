@@ -9,6 +9,9 @@ class_name SkillData
 @export var max_level: int = 1
 
 # ค่าตามเลเวลเก็บเป็นรายการ [Lv1, Lv2, ...] ถ้ารายการสั้นกว่าเลเวล ใช้ตัวสุดท้าย
-func level_value(values: Array, level: int) -> Variant:
-	assert(not values.is_empty(), "%s: รายการค่าตามเลเวลว่าง" % id)
+static func pick(values: Array, level: int) -> Variant:
+	assert(not values.is_empty(), "รายการค่าตามเลเวลว่าง")
 	return values[clampi(level - 1, 0, values.size() - 1)]
+
+func level_value(values: Array, level: int) -> Variant:
+	return pick(values, level)

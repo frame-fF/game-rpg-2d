@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_stats")
+defense = 0
 max_hp = 50
 hp = 50
 attack_power = 20

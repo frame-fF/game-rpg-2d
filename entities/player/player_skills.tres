@@ -4,11 +4,17 @@
 [ext_resource type="Script" path="res://data/active_skill.gd" id="2_active"]
 [ext_resource type="Resource" path="res://skills/power_strike.tres" id="3_strike"]
 [ext_resource type="Resource" path="res://skills/fireball.tres" id="4_fire"]
+[ext_resource type="Resource" path="res://skills/flame_armor.tres" id="5_flame"]
+[ext_resource type="Resource" path="res://skills/iron_skin.tres" id="6_iron"]
+[ext_resource type="Script" path="res://data/passive_skill.gd" id="7_passive"]
 
 [resource]
 script = ExtResource("1_script")
-hotbar = Array[ExtResource("2_active")]([ExtResource("3_strike"), ExtResource("4_fire"), null, null])
+hotbar = Array[ExtResource("2_active")]([ExtResource("3_strike"), ExtResource("4_fire"), ExtResource("5_flame"), null])
+passives = Array[ExtResource("7_passive")]([ExtResource("6_iron")])
 levels = {
 "fireball": 1,
+"flame_armor": 1,
+"iron_skin": 1,
 "power_strike": 2
 }

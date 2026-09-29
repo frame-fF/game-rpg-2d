@@ -7,10 +7,12 @@ extends CharacterBody2D
 @export var attack_hit_frame: int = 1 # เฟรมของท่า attack ที่ดาเมจเข้า
 @export var projectile_scene: PackedScene # ใส่ = ตีไกล (ยิงจากตำแหน่ง AttackArea), ว่าง = ตีประชิด
 @export var skills: Array[ActiveSkill] = [] # สกิลเสริม ใช้เมื่อ cooldown หมดและเป้าอยู่ในระยะสกิล
+@export var passives: Array[PassiveSkill] = []
 @export var skill_level: int = 1
 @export var chase_distance: float = 400.0 # เป้าไกลกว่านี้ = เลิกไล่
 
 var team: String = "monster"
+var effects: EffectHolder
 var skill_cooldowns: Dictionary = {} # id สกิล -> วินาทีที่เหลือ (แยกต่อตัว)
 var pending_skill: ActiveSkill        # สกิลที่จะออกตอนถึงเฟรมโจมตี
 
@@ -29,6 +31,11 @@ var attack_box_x: float # ระยะกล่องโจมตีจากต
 
 func _ready() -> void:
 	stats = stats.duplicate()
+	effects = EffectHolder.new()
+	effects.name = "Effects"
+	add_child(effects)
+	for passive in passives:
+		effects.add(passive.id, passive.skill_name, passive.effects, skill_level, -1.0)
 	start_x = position.x
 	attack_box_x = absf(attack_area.position.x)
 	detect_area.body_entered.connect(_on_detect_entered)
@@ -60,7 +67,7 @@ func _physics_process(delta: float) -> void:
 			if cooldown_timer <= 0.0:
 				_start_attack()
 		else:
-			velocity.x = direction * stats.move_speed
+			velocity.x = direction * get_stat("move_speed")
 	else:
 		_patrol()
 
@@ -82,7 +89,7 @@ func _patrol() -> void:
 		direction = -1.0
 	elif position.x < start_x - patrol_distance:
 		direction = 1.0
-	velocity.x = direction * stats.move_speed
+	velocity.x = direction * get_stat("move_speed")
 
 func _start_attack() -> void:
 	is_attacking = true
@@ -108,9 +115,13 @@ func _on_frame_changed() -> void:
 	else:
 		Combat.hit_bodies(self, attack_area.get_overlapping_bodies(), get_attack_power())
 
+func get_stat(stat: String) -> float:
+	var value: float = stats.get(stat) + effects.stat_flat(stat)
+	return maxf(value * (1.0 + effects.stat_percent(stat) / 100.0), 0.0)
+
 # ที่สกิลเรียกใช้ (ผู้เล่นมีฟังก์ชันชื่อเดียวกัน)
 func get_attack_power() -> int:
-	return stats.attack_power
+	return int(get_stat("attack_power"))
 
 func get_facing() -> float:
 	return direction
@@ -136,6 +147,7 @@ func take_damage(amount: int, attacker: Node2D = null) -> void:
 		return
 	if attacker and Combat.is_enemy(self, attacker):
 		target = attacker # โดนตีแล้วไล่คนตี แม้อยู่นอกระยะมองเห็น
+	amount = maxi(1, amount - int(get_stat("defense")))
 	stats.hp -= amount
 	print("Monster took ", amount, " damage. HP: ", stats.hp, "/", stats.max_hp)
 	if stats.hp <= 0:
@@ -143,6 +155,7 @@ func take_damage(amount: int, attacker: Node2D = null) -> void:
 
 func die() -> void:
 	is_dead = true
+	effects.clear()
 	collision_layer = 0 # ตีซ้ำไม่ได้ ลูกธนูทะลุ
 	detect_area.set_deferred("monitoring", false)
 	attack_area.set_deferred("monitoring", false)

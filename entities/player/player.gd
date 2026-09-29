@@ -31,9 +31,15 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var mp_regen: float = 2.0 # MP ต่อวินาที
 
 var team: String = "player"
+var effects: EffectHolder
 var _mp_regen_acc: float = 0.0
 
 func _ready() -> void:
+	effects = EffectHolder.new()
+	effects.name = "Effects"
+	add_child(effects)
+	for passive in skills.passives:
+		effects.add(passive.id, passive.skill_name, passive.effects, skills.get_level(passive), -1.0)
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	animated_sprite.frame_changed.connect(_sync_layers)
 	animated_sprite.animation_changed.connect(_sync_layers)
@@ -55,7 +61,7 @@ func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 		
-	var move_speed := stats.move_speed * inventory.get_move_speed()
+	var move_speed := get_stat("move_speed")
 	var direction: float = Input.get_axis("move_left", "move_right")
 	if direction != 0:
 		facing_direction = sign(direction)
@@ -91,7 +97,7 @@ func _physics_process(_delta: float) -> void:
 	if is_dashing:
 		animated_sprite.play("dash")
 	elif is_attacking:
-		animated_sprite.play(attack_anim, stats.attack_speed * inventory.get_attack_speed())
+		animated_sprite.play(attack_anim, get_stat("attack_speed"))
 	elif not is_on_floor():
 		animated_sprite.play("jump")
 	elif direction != 0:
@@ -133,9 +139,14 @@ func _regen_mp(delta: float) -> void:
 		stats.mp = mini(stats.mp + int(_mp_regen_acc), stats.max_mp)
 		_mp_regen_acc -= int(_mp_regen_acc)
 
+# stat จริง = (พื้นฐาน + ชุด + Effect) x ตัวคูณชุด x (1 + Effect%) — ทุกที่ที่ใช้ stat เรียกฟังก์ชันนี้
+func get_stat(stat: String) -> float:
+	var value: float = stats.get(stat) + inventory.get_flat_bonus(stat) + effects.stat_flat(stat)
+	return maxf(value * inventory.get_multiplier(stat) * (1.0 + effects.stat_percent(stat) / 100.0), 0.0)
+
 # ที่สกิลเรียกใช้ (มอนมีฟังก์ชันชื่อเดียวกัน)
 func get_attack_power() -> int:
-	return stats.attack_power + inventory.get_attack_power_bonus()
+	return int(get_stat("attack_power"))
 
 func get_facing() -> float:
 	return facing_direction
@@ -145,7 +156,7 @@ func get_attack_origin() -> Vector2:
 
 
 func take_damage(amount: int, _attacker: Node2D = null) -> void:
-	var damage := maxi(1, amount - (stats.defense + inventory.get_defense_bonus()))
+	var damage := maxi(1, amount - int(get_stat("defense")))
 	stats.hp = maxi(stats.hp - damage, 0)
 	print("Player took ", damage, " damage. HP: ", stats.hp, "/", stats.max_hp)
 	if stats.hp == 0:
